@@ -1,4 +1,4 @@
 *.DS_*
 
 srv/*
-!srb/README.md
+!srv/README.md
