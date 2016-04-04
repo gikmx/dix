@@ -1,0 +1,353 @@
+call plug#begin('~/.vim/bundle')                                                  " :PLUG
+"----------------------------------------------------------------------------------------
+
+" plug» on-load»
+Plug 'morhetz/gruvbox'                    " A true-color enabled theme
+Plug 'noahfrederick/vim-noctu'            " A term16 theme (loaded only on vim)
+Plug 'scrooloose/nerdtree'                " file manager for vim
+Plug 'Xuyuanp/nerdtree-git-plugin'        " Enable git status flags on NerdTree
+Plug 'tpope/vim-fugitive'                 " Commands for git
+Plug 'tpope/vim-commentary'               " Comments/uncomments
+Plug 'tpope/vim-sleuth'                   " Auto-adjust tabbing settings according to file
+Plug 'tpope/vim-ragtag'                   " Autocloses xml style tags
+Plug 'tpope/vim-surround'                 " Operate on surrounding stuff
+Plug 'tpope/vim-obsession'                " Session auto capture
+Plug 'ctrlpvim/ctrlp.vim'                 " Fuzzy file finder
+Plug 'jiangmiao/auto-pairs'               " Insert or delete [, (, {, or ' in pairs
+Plug 'luochen1990/rainbow'                " Enable theme sharing with xterm
+Plug 'nathanaelkane/vim-indent-guides'    " Indentation
+Plug 'airblade/vim-gitgutter'             " Enable Git diff on gutter
+Plug 'godlygeek/tabular'                  " Enable spacing with regex
+Plug 'EvanDotPro/nerdtree-chmod'          " Enable chmoding from nerdtree
+Plug 'esneider/YUNOcommit.vim'            " Shows a message if no commits are made in a while
+Plug 'wakatime/vim-wakatime'              " Keep track of time spent on vim
+Plug 'mbbill/undotree'                    " shows a visual representation of undo history
+Plug 'takac/vim-hardtime'                 " Sets timeout for movement keys to actually learn
+Plug 'easymotion/vim-easymotion'          " Allow jumping the file using letters
+Plug 'rking/ag.vim'                       " enable search-for-text using the_silver_surfer
+Plug 'octref/RootIgnore'                  " Sets wildignore to whatever gitignore has
+Plug 'terryma/vim-multiple-cursors'       " True ST3 style multiple selections
+Plug 'wesQ3/vim-windowswap'               " Swap between panes with ease
+Plug 'tmux-plugins/vim-tmux-focus-events' " Enable Focus[Gained/Lost] on terminal
+Plug 'itchyny/lightline.vim'              " Like airline, but lighter
+
+" plug» with-startup-script»
+Plug 'scrooloose/syntastic', {'do': 'npm i -g jshint'} " Enable syntax check
+
+" plug» on-filetype»
+Plug 'moll/vim-node'                          , { 'for': 'javascript'      }
+Plug 'othree/yajs.vim'                        , { 'for': 'javascript'      } " JS syntax
+Plug 'othree/es.next.syntax.vim'              , { 'for': 'javascript'      }
+Plug 'othree/javascript-libraries-syntax.vim' , { 'for': 'javascript'      }
+Plug 'othree/html5.vim'                       , { 'for': 'html'            }
+Plug 'mattn/emmet-vim'                        , { 'for': 'html'            }
+Plug 'hail2u/vim-css3-syntax'                 , { 'for': 'css'             }
+Plug 'digitaltoad/vim-jade'                   , { 'for': 'jade'            }
+Plug 'wavded/vim-stylus'                      , { 'for': 'stylus'          }
+Plug 'ap/vim-css-color'                       , { 'for': ['css', 'stylus'] }
+Plug 'plasticboy/vim-markdown'                , { 'for': 'markdown'        }
+Plug 'tmux-plugins/vim-tmux'                  , { 'for': 'tmux'            }
+
+"plug» neovim-only»
+if has('nvim') && has('python3')
+    Plug 'Shougo/deoplete.nvim'                                        " Autocompletion
+    Plug 'ternjs/tern_for_vim', { 'for': 'javascript', 'do': 'npm i' } " …for javascript
+    Plug 'SirVer/ultisnips'                                            " Enable Snippets
+endif
+
+"----------------------------------------------------------------------------------------
+call plug#end()
+filetype plugin indent on
+
+"                                                                                :GENERAL
+"----------------------------------------------------------------------------------------
+
+" general» flags»
+syntax on          " Enable color syntax for known files
+set nospell        " Disable spelling checking
+set title          " Vim will set the terminal title
+set magic          " Enables regex magic, no need for backslashes in some cases.
+set showcmd        " Shows the last command entered
+set wildmenu       " Enables extended features for completion
+set autoread       " Detect when a file has changed
+set hidden         " buffer» Dont unload buffer when closed
+set showmatch      " show match on parenthesis and curly braces
+set writebackup    " … unless you're currently editing.
+set number         " lines» Enable line numbers
+set relativenumber " lines» Enable relative line numbering
+set nowrap         " lines» Disable line wrapping
+set incsearch      " search» Search as you type
+set hlsearch       " search» Highlight search results
+set ignorecase     " search» Ignore case when searching…
+set smartcase      " search» … but not when an uppercase letter is present
+set gdefault       " search» Assume always /g on replacements
+set autoindent     " indent» Enable auto indentation
+set smartindent    " indent» Determine indentation level automatically
+set expandtab      " indent» Inserts spaces rather than tabs
+set smarttab       " indent» tab respects 'tabstop' 'shiftwidth' and 'softtabstop'
+set shiftround     " indent» round indent to a multiple of 'shiftwidth'
+set cursorline     " Show the current line
+set cursorcolumn   " Show the current column
+set splitbelow     " Open splits below instead of above
+set splitright     " Open slits right instead of above
+set backup         " Enable backup file crea
+set swapfile       " Enable swapfile creation
+set undofile       " Enable undo management
+
+" general» settings»
+set synmaxcol=200                    " Only render syntax for first 200 cols
+set background=dark                  " Use default colors for dark background
+set wildmode=list:longest            " autocomplete until longest word is filled
+set diffopt=vertical,filler          " Define window behaviour for diffs (horizontal split)
+set grepprg=ag                       " search» Use the_silver_searcher insteand of grep
+set directory=$HOME/.vim/cache/swap/ " cache» Set dir for swapfiles
+set backupdir=$HOME/.vim/cache/back/ " cache» Set dir for backups
+set undodir=$HOME/.vim/cache/undo/   " cache» Set dir for undos
+set updatetime=50                    " git» lower the time it takes to update gitgutter
+set scrolloff=9999                   " buffer» Always maintain n lines of context
+set history=1000                     " buffer» Control the history length
+set textwidth=100                    " buffer» maximum length of a line
+set colorcolumn=90                   " buffer» draws a bar on given line
+set laststatus=2                     " buffer» draws a status bar on the bottom
+set foldcolumn=2                     " gutter» Makes the gutter a little wider
+set numberwidth=4                    " gutter» Sets the width of the line numbering column
+set backspace=indent,eol,start       " indent» Make backspace behave the way you expect
+set tabstop=8                        " indent» Set tab length
+set softtabstop=0                    " indent» Force softtabbing
+set shiftwidth=4                     " indent» How many cols to indent on reindent
+set clipboard^=unnamed               " system-wide clipboard supprt
+set listchars=tab:▸-,space:·,eol:¬,trail:·,nbsp:×,extends:❯,precedes:❮ " Invisibles
+
+" general» vars»
+let mapleader=' '      " Use space as <Leader> key for plugins namespace
+let &t_SI="\<Esc>[5 q" " Cursor» blink pipe on Insert
+let &t_SR="\<Esc>[3 q" " Cursor» blink underline on Replace
+let &t_EI="\<Esc>[2 q" " Cursor> restore on exit modes
+
+if has('nvim')
+
+    " general» nvim-only» flags»
+    let $NVIM_TUI_ENABLE_TRUE_COLOR=1   " Enable 24bit colors when supported
+    let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1 " Change the cursor when entering insert mode
+    let g:gruvbox_italic=1              " Force gruvbox to use italics (configured on install)
+    let &colorcolumn=join(range(91,999), ',') " Show different color aftter line 90
+    colorscheme gruvbox
+    hi CursorLine  guibg='#202020'
+    hi ColorColumn guibg='#303030'
+
+else
+
+    " general» vim-only» flags»
+    colorscheme noctu " Set the color scheme
+
+    " general» vim-only» settings»
+    set encoding=utf-8 " make sure the encoding is the correct one
+    set t_Co=16
+
+endif
+
+"                                                                       :PLUGIN-SETTINGS
+"----------------------------------------------------------------------------------------
+
+" plugin» fugitive»
+let g:fugitive_git_executable = 'LANG=en_US.UTF-8 git' " Fix https://github.com/tpope/vim-git/issues/12
+
+" plugin» syntastic»
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+let g:syntastic_always_populate_loc_list=1     " Make sure the error checklist is populated
+let g:syntastic_auto_loc_list=1                " Automatically open error checklist
+let g:syntastic_check_on_open=1                " Check errors on file open
+let g:syntastic_check_on_wq=0                  " Check errors on write, quit
+let g:syntastic_enable_signs=1                 " Make sure that signs are always shown
+let g:syntastic_enable_highlighting=1         " Highlight errors
+let g:syntastic_enable_balloons=1              " Show errors on balloons when mouse passes over
+let g:syntastic_echo_current_error=1           " Show error con command window
+let g:syntastic_error_symbol='✘'               " Customize error symbol
+let g:syntastic_warning_symbol='➜'             " Customize warning symbol
+let g:syntastic_vim_checkers=['vint']          " Define the linter for vim
+let g:syntastic_javascript_checkers=['jshint'] " Define the linter for javascript
+
+" plugin» vim-indent-plugin»
+let g:indent_guides_enable_on_vim_startup=1   " Enable plugin on startup
+let g:indent_guides_start_level=2             " In which indentation level begin marking
+let g:indent_guides_guide_size=1              " width of mark (only valid for spaces)
+let g:indent_guides_auto_colors=0             " Disable autocoloring, set'em manually
+
+" plugin» nerdtree»
+let g:NERDTreeHighlightCursorLine=1 " Highlight the current line
+let g:NERDTreeQuitOnOpen=1          " Close buffer when opening a file
+let g:NERDTreeShowHidden=1          " Show hidden files by default
+let g:NERDTreeChDirMode=1           " Change directory when selecting
+let g:NERDTreeMinimalUI=1           " Don't show neither bookmarks nor help message
+let g:NERDTreeAutoDeleteBuffer=1    " remove buffer when deleting or renaming a file
+let g:NERDTreeRespectWildIgnore=1   " respect wildgnore and thus, gitignore
+
+" plugin» nerdtree-git-pugin»
+let g:NERDTreeIndicatorMapCustom = {
+    \"Modified"  : "❯",
+    \"Staged"    : "✚",
+    \"Untracked" : "✦",
+    \"Renamed"   : "❖",
+    \"Unmerged"  : "☯",
+    \"Deleted"   : "✖",
+    \"Dirty"     : "✱",
+    \"Clean"     : "★",
+    \"Unknown"   : "?"
+\}
+
+" plugin» markdown»
+let g:vim_markdown_folding_disabled=1 " disable folding
+
+" plugin» ctrlp» Make the plugin gitignore-aware
+let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+let g:ctrlp_follow_symlinks=1 "  Follow symlinks, but avoid recursion
+
+" plugin» javascript-libraries-syntax»
+let g:used_javascript_libs='underscore,react,chai'
+
+" plugin» hardtime»
+let g:hardtime_default_on=1                                           " This is how I Die
+let g:hardtime_showmsg=1                                              " Reminds death
+let g:hardtime_allow_different_key=1                                  " jjh: yup jjj: no
+let g:hardtime_maxcount=2                                             " jj: yup jjj: no
+let g:list_of_normal_keys=['h', 'j', 'k', 'l', '+', '-']              " normal mode
+let g:list_of_visual_keys=['h', 'j', 'k', 'l', '+', '-']              " visual mode
+let g:list_of_disabled_keys=['<UP>', '<DOWN>', '<LEFT>', '<RIGHT>']   " all modes
+let g:hardtime_ignore_buffer_patterns=['NERD.*', 'help', 'gitcommit'] " Ignore these
+let g:hardtime_ignore_quickfix=1                                      " … and quickfix
+
+" plugin» rainbow»
+let g:rainbow_active=1 " Enable rainbow on startup.
+
+" plugin» deoplete»
+let g:deoplete#enable_at_startup=1      " Enable deoplete at startup.
+let g:deoplete#enable_smart_case=1      " When an uppercase is written stoo being insensite
+let g:deoplete#omni#input_patterns = {} " Disable omnifunc
+
+" plugin» ultisnips»
+let g:UltiSnipsSnippetsDir='~/.nvim/snippets/' " Determine snippets location
+let g:UltiSnipsEditSplit='vertical'            " Determine how to open snippet editor
+
+" plugin» tern_for_vim»
+let g:tern_map_keys=1
+let g:tern_show_argument_hints='on_hold'
+let g:tern_show_signature_in_pum=1
+
+" plugin» windowswap»
+let g:windowswap_map_keys=0 " Prevent default key-mappings
+
+" plugin» lightline»
+let g:lightline = {
+\   'colorscheme': 'gruvbox',
+\   'active': {
+\       'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ], ['ctrlpmark'] ],
+\       'right': [ [ 'syntastic', 'lineinfo' ], ['percent'], [ 'fileformat', 'fileencoding', 'filetype' ] ]
+\   },
+\   'component': {
+\       'readonly': '%{&readonly?"":""}',
+\       'modified': '%{&filetype=="help"?"":&modified?"+":&modifiable?"":"-"}'
+\   },
+\   'separator': { 'left': '', 'right': '' },
+\   'subseparator': { 'left': '', 'right': '' }
+\   }
+
+" TODO: Follow guide in: https://github.com/itchyny/lightline.vim
+"                                                                                :MAPPING
+"----------------------------------------------------------------------------------------
+
+" mapping» visual
+vnoremap <Leader>t :Tabularize /\v/<left>| " Just saving effort
+
+" mapping» general»
+inoremap <C-a> <Esc>
+nnoremap <Leader>w :update<CR>
+tnoremap <C-a> <C-\><C-n>
+tnoremap <Esc> <C-\><C-n>|                                " Exit the terminal easily
+nnoremap <Leader>% :source $MYVIMRC<CR>|                  " reload vimrc settings
+nnoremap <Leader>y :call WindowSwap#MarkWindowSwap()<CR>| " window» yank (for swap)
+nnoremap <Leader>p :call WindowSwap#DoWindowSwap()<CR>|   " window» paste (swap)
+nnoremap <Leader>h <C-w>h|                                " window» move to pane left
+nnoremap <Leader>j <C-w>j|                                " window» move to pane below
+nnoremap <Leader>k <C-w>k|                                " window» move to pane above
+nnoremap <Leader>l <C-w>l|                                " window» move to pane right
+nnoremap <Leader>\| :vnew<CR>|                            " window» new vert. split
+nnoremap <Leader>- :new<CR>|                              " window» new ho. split
+nnoremap <Leader><Left> :vertical resize +1<CR>|          " window» resize left
+nnoremap <Leader><Right> :vertical resize -1<CR>|         " window» resize right
+map <Leader><Up> :resize +1<CR>|                          " window» resize up
+map <Leader><Down> :resize -1 <CR>|                       " window» resize down
+
+" mapping» info»
+nnoremap <Leader>ib :ls!<CR>|                              " Active buffers
+
+" mapping» toggle»
+nnoremap <Leader>ti :set list!<CR>|                        " Invisible chars
+nnoremap <Leader>tn :NERDTreeToggle<CR>|                   " Nerdtree
+nnoremap <Leader>tu :UndotreeToggle<CR>|                   " Undotree
+
+" mapping» search»
+nnoremap / /\v|                                            " search magically
+cnoremap %s %s/\v|                                         " replace magically
+nnoremap // :%s/\v                                         " replace shortcut
+nnoremap <silent> <Esc><Esc> :nohlsearch<CR><Esc>|         " Clear search highlights
+nnoremap <silent> <Esc><Esc><Esc> :/^❌ 💩 /<CR>|            " Forget current search
+nnoremap <Leader>/ :Ag<Space>|                             " search text in project
+
+" mapping» motion»
+map <Leader>mm <Plug>(easymotion-overwin-f)|               " using a char
+map <Leader>mc <Plug>(easymotion-overwin-f2)|              " using 2 chars
+map <Leader>mw <Plug>(easymotion-overwin-w)|               " using a word
+map <Leader>ml <Plug>(easymotion-overwin-line)|            " using a line
+nnoremap <Leader>mn :GitGutterNextHunk<CR>|                " Git» hunk Next
+nnoremap <Leader>mp :GitGutterPrevHunk<CR>|                " Git» hunk Prev
+
+" mapping» git»
+nnoremap <Leader>g+ :GitGutterStageHunk<CR>|               " Git» hunk Stage
+nnoremap <Leader>g- :GitGutterRevertHunk<CR>|              " Git» hunk Revert
+nnoremap <Leader>gc :Gcommit<CR>|                          " Git» Commit
+nnoremap <Leader>gs :Gstatus<CR>|                          " Git» Status
+nnoremap <Leader>gw :Gwrite<CR>|                           " Git» Write (add|checkout)
+nnoremap <Leader>gr :Gread<CR>|                            " Git» Read (checkout|add)
+nnoremap <Leader>gd :Gdiff<CR>|                            " Git» Diff
+nnoremap <Leader>gp :Gpush<CR>|                            " Git» Push
+
+" mapping» tags»
+nnoremap <Leader>rt :GutentagsUpdate<CR>|                  " Reload Tags
+"----------------------------------------------------------------------------------------
+
+" Make NerdTree close when no other buffer exists
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+" Show ExtraWhitespace [TODO: Should be inside the colorscheme]
+autocmd VimEnter,Colorscheme,BufWinEnter * highlight ExtraWhitespace  guibg=#ff0000 ctermbg=1
+
+" ExtraWhiteSpace Matching
+autocmd BufWinEnter * match ExtraWhitespace /\s\+$/        " Highlight trailing whitespace
+autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/ " Disable highlight on insert
+autocmd InsertLeave * match ExtraWhitespace /\s\+$/        " …but reenable it afterwards
+autocmd BufWinLeave * call clearmatches()                  " Apply matching to new buffers
+
+" auto» omnifunc»
+augroup omnifuncs
+    autocmd!
+    autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+    autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+    " autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+augroup end
+
+" auto» plugin» deoplete»
+autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif " auto-close scratch
+
+" Enable tern for javascript files
+autocmd FileType javascript setlocal omnifunc=tern#Complete
+
+" Automatically enter InsertMode when focusing a Terminal
+autocmd TermOpen * autocmd BufEnter <buffer> call feedkeys('i')
+
+" auto» lightline»
+augroup reload_vimrc
+    autocmd!
+    autocmd bufwritepost $MYVIMRC nested source $MYVIMRC " Reload lightline along .vimrc
+augroup END
