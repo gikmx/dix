@@ -2,3 +2,6 @@
 
 srv/*
 !srv/README.md
+
+var/*
+!var/README.md
