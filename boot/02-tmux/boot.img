@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+
+# Make sure tmux's plugin manager is installed
+[ ! -d ~/.tmux/plugins/tpm ] && \
+    echo "Installing tmux's plugin manager" && \
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm

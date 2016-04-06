@@ -1,0 +1,8 @@
+#! /usr/bin/env bash
+
+if [ -z "$(nvm ls default)" ]; then
+    echo "Enabling latest version of node"
+    target=$(nvm ls-remote | tail -1 | xargs)
+    nvm install $target
+    nvm alias default $target
+fi

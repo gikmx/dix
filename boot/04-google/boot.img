@@ -1,0 +1,11 @@
+#! /usr/bin/env bash
+
+# Google Cloud SDK.
+gc_prefix="$HOME/Source/External"
+gc_dirname='google-cloud-sdk'
+if [ ! -d "$gc_prefix/$gc_dirname" ]; then
+	[ ! -d "$gc_prefix" ] && mkdir -p $gc_prefix
+	curl https://sdk.cloud.google.com | PREFIX=$gc_prefix bash
+fi
+source "$gc_prefix/$gc_dirname/path.bash.inc"
+source "$gc_prefix/$gc_dirname/completion.bash.inc"
