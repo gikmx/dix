@@ -21,7 +21,17 @@ boot.pause(){
 }
 
 boot.menu(){
+	paths=()
+	infos=()
 
+	for path in `find $DOTFILES_PATH_BOOT -type f -name "boot.ini"`; do
+		paths+=("`basename $path`")
+		infos+=("`cat $path`")
+	done
+	infos+=(" esto es una prueba")
+	echo $paths
+	echo "${infos[1]}"
+	return
 	# Capture cancellation signals so the user MUST input.
 	trap '' SIGINT
 	trap '' SIGQUIT
@@ -31,7 +41,7 @@ boot.menu(){
 		# show menu
 		clear
 		boot.motd
-		boot.head "main meny"
+		boot.head "Main Menu"
 		echo "1. Show current date/time"
 		echo "2. Show what users are doing"
 		echo "3. Show top memory & cpu eating process"
