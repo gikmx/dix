@@ -55,7 +55,7 @@ boot.menu(){
 		if [ -f "${paths[$val]}/boot-$(sys.get).img" ]; then
 			source ${paths[$val]}/boot-$(sys.get).img || exit 1
 		fi
-
+		echo
 		read -p "Done. Press [Enter] to continue ..."
 	done
 }

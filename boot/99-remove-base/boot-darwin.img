@@ -1,0 +1,11 @@
+#! /usr/bin/env bash
+
+[ ! -f $HOME/.dotfiles ] && echo "Dotfiles not installed" && exit
+[ -z "$DOTFILES" ] && source $HOME/.dotfiles
+
+echo "Uninstalling brew ..."
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+
+printf "\nRestoring permissions ...\n"
+sudo chmod 0755 /usr/local
+sudo chgrp wheel /usr/local
