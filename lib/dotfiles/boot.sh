@@ -30,13 +30,14 @@ boot.menu(){
 		boot.motd
 		boot.head "Main Menu"
 		echo
-		paths=(' ')
-		infos=('Exit')
-		i=0
+		paths=(true)
+		infos=(true)
+		echo "0. Exit"
+		i=1
 		for file in `find $DOTFILES_PATH_BOOT -type f -name "boot.ini"`; do
-			paths+=("dir${file%/*}")
+			paths+=("${file%/*}")
 			infos+=("`cat $file`")
-			echo "${i}. ${infos[$i]}"
+			echo "$i. ${infos[$i]}"
 			((i++))
 		done
 		printf "\n$(string.repeat "–" 80)\n\n"
@@ -46,8 +47,15 @@ boot.menu(){
 		[[ ! $val =~ ^[0-9]+ || $val -gt $((i-1)) ]] && continue
 		# if 0, break the loop
 		[[ $val == 0 ]] && break
+		clear
 
-		echo ${paths[$val]}
+		[ ! -f "${paths[$val]}/boot.img" ] && echo "Image not found." && exit 1
+		source ${paths[$val]}/boot.img || exit 1
 
+		if [ -f "${paths[$val]}/boot-$(sys.get).img" ]; then
+			source ${paths[$val]}/boot-$(sys.get).img || exit 1
+		fi
+
+		read -p "Done. Press [Enter] to continue ..."
 	done
 }
