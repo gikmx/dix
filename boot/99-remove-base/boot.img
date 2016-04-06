@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+
+[ ! -f $HOME/.dotfiles ] && echo "Dotfiles not installed" && exit
+[ -z "$DOTFILES" ] && source $HOME/.dotfiles
+
+boot.head "Uninstalling Base Packages"
