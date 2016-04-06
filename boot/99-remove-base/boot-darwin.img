@@ -1,11 +1,19 @@
 #! /usr/bin/env bash
+! $DOTFILES    && echo "Dotfiles is required."  && exit 1
+! sys.is_mac   && echo "Invalid platform."      && exit 1
 
-[ ! -f $HOME/.dotfiles ] && echo "Dotfiles not installed" && exit
-[ -z "$DOTFILES" ] && source $HOME/.dotfiles
+echo "Restoring bash ..."
+sudo chsh -s "/bin/bash"
 
 echo "Uninstalling brew ..."
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+yes '' | /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
 
 printf "\nRestoring permissions ...\n"
 sudo chmod 0755 /usr/local
 sudo chgrp wheel /usr/local
+
+reset
+hash -r # reload the hashtable
+source $DOTFILES_PATH_LIB/profile/env.sh
+
+clear
