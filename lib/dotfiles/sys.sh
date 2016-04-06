@@ -1,22 +1,26 @@
 #! /usr/bin/env bash
 [ -z "$DOTFILES" ] && echo "Invalid enviromnent." && exit
 
+sys.get(){
+	echo $(string.lower `uname -s`)
+}
+
 # Test current system
-sys(){
-	test $(str.lower `uname -s`) = $(str.lower $1)
+sys.is(){
+	test sys.get = $(str.lower $1)
 }
 
 # Test if current system is a mac
-sys.mac() {
-	sys 'Darwin'
+sys.is_mac() {
+	sys.is 'Darwin'
 }
 
 # Test if current system is linux
-sys.linux() {
-    sys 'Linux'
+sys.is_linux() {
+    sys.is 'Linux'
 }
 
 # Test if current system is archlinux
-sys.arch() {
-    sys.linux && test -f '/etc/arch-release'
+sys.is_arch() {
+    sys.is_linux && test -f '/etc/arch-release'
 }
