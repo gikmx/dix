@@ -1,0 +1,28 @@
+#! /usr/bin/env bash
+
+# Install the main dotfiles script
+pushd $(dirname $0) > /dev/null
+    # The variable that rules them all.
+    DOTFILES_PATH=$(pwd -P)
+    # Set and store secondary environment variables
+    DIRS=`find $DOTFILES_PATH -maxdepth 1 -type d ! -name ".*" ! -path $DOTFILES_PATH`
+    for DIR in $DIRS; do
+        # Get the name of the dir and convert it to uppercase.
+        NAME=DOTFILES_PATH_`basename $DIR | tr '[:lower:]' '[:upper:]'`
+        # If non-existant, create a file for the environment variable
+        echo "$DIR" > "$DOTFILES_PATH/srv/$NAME"
+    done
+    # Store the variables so the main script restores them
+    echo "$DOTFILES_PATH" > $DOTFILES_PATH/srv/DOTFILES_PATH
+    echo "$DOTFILES_PATH/lib/dotfiles" > $DOTFILES_PATH/srv/DOTFILES_PATH_SELF
+
+    # This is it. install it to $HOME
+    rm -f $HOME/.dotfiles
+    ln -sf $DOTFILES_PATH/sbin/dotfiles $HOME/.dotfiles
+
+popd > /dev/null
+
+
+source ~/.dotfiles || exit
+
+boot.menu
