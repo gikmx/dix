@@ -1,13 +1,26 @@
 #! /usr/bin/env bash
 [ -z "$DOTFILES" ] && echo "Invalid enviromnent." && exit
 
-sys.get(){
-	echo $(string.lower `uname -s`)
+# Get the current system name
+sys.name(){
+	echo $(string.lower "`uname -s`")
+}
+
+# Test if the command ($1) is available on the system
+sys.has(){
+	[ -z "$1" ] && return 1
+	! test -z "`command -v $1`"
+}
+
+sys.has_brew(){
+	! sys.has 'brew' && return 1               # no brew available
+	sys.has 'brew' && [ -z "$1" ] && return 0  # has brew, and no argument
+	test -d $(brew --prefix $1)                # do the actual test using brew
 }
 
 # Test current system
 sys.is(){
-	test sys.get = $(str.lower $1)
+	test $(sys.name) = $(string.lower "$1")
 }
 
 # Test if current system is a mac
