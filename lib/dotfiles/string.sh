@@ -1,3 +1,6 @@
+#! /usr/bin/env bash
+[ -z "$DOTFILES" ] && echo "Invalid enviromnent." && exit
+
 string.lower() {
 	echo "$1" | tr '[:upper:]' '[:lower:]'
 }

@@ -1,3 +1,6 @@
+#! /usr/bin/env bash
+[ -z "$DOTFILES" ] && echo "Invalid enviromnent." && exit
+
 # Take ownership of target ($1)
 set.ownership() {
     sudo -k chown -R $(id -u):$(id -g) $1
