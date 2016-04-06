@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-[ -z "$DOTFILES" ] && echo "Invalid enviromnent." && exit
+[ -z "$DOTFILES" ] && echo "Invalid environment" && exit 1
 
 boot.motd(){
 	cat $DOTFILES_PATH_LIB/boot/motd
@@ -52,8 +52,8 @@ boot.menu(){
 		[ ! -f "${paths[$val]}/boot.img" ] && echo "Image not found." && exit 1
 		source ${paths[$val]}/boot.img || exit 1
 
-		if [ -f "${paths[$val]}/boot-$(sys.get).img" ]; then
-			source ${paths[$val]}/boot-$(sys.get).img || exit 1
+		if [ -f "${paths[$val]}/boot-$(sys.name).img" ]; then
+			source ${paths[$val]}/boot-$(sys.name).img || exit 1
 		fi
 		echo
 		read -p "Done. Press [Enter] to continue ..."
