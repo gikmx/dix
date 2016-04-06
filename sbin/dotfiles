@@ -26,11 +26,11 @@ for path in `ls.path_srv`; do declare -x "`basename $path`"="`cat $path`"; done
 ls.path_self(){
     find $DOTFILES_PATH_SELF -maxdepth 1 -type f -name "*.sh"
 }
+# Allow scripts to validate if this was already loaded
+DOTFILES=true
+
 # load utilities
 for path in `ls.path_self`; do source "$path"; done
 
 # clear unneeded variables
 unset path
-
-# Allow scripts to validate if this was already loaded
-DOTFILES=true
