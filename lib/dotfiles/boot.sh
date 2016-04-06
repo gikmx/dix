@@ -1,3 +1,6 @@
+#! /usr/bin/env bash
+[ -z "$DOTFILES" ] && echo "Invalid enviromnent." && exit
+
 boot.motd(){
 	cat $DOTFILES_PATH_LIB/boot/motd
 	echo
@@ -14,51 +17,37 @@ boot.head(){
 	string.repeat "–" $width && printf "\n"
 }
 
-boot.pause(){
-	local m="$@"
-	echo "$m"
-	read -p "Press [Enter] key to continue..." key
-}
-
 boot.menu(){
-	paths=()
-	infos=()
 
-	for path in `find $DOTFILES_PATH_BOOT -type f -name "boot.ini"`; do
-		paths+=("`basename $path`")
-		infos+=("`cat $path`")
-	done
-	infos+=(" esto es una prueba")
-	echo $paths
-	echo "${infos[1]}"
-	return
 	# Capture cancellation signals so the user MUST input.
 	trap '' SIGINT
 	trap '' SIGQUIT
 	trap '' SIGTSTP
 
-	while :; do
+	while true; do
 		# show menu
 		clear
 		boot.motd
 		boot.head "Main Menu"
-		echo "1. Show current date/time"
-		echo "2. Show what users are doing"
-		echo "3. Show top memory & cpu eating process"
-		echo "4. Show network stats"
-		echo "5. Exit"
-		echo "---------------------------------"
-		read -r -p "Enter your choice [1-5] : " c
-		# take action
-		case $c in
-			1) pause "$(date)";;
-			2) w| less;;
-			3) echo '*** Top 10 Memory eating process:'; ps -auxf | sort -nr -k 4 | head -10;
-			   echo; echo '*** Top 10 CPU eating process:';ps -auxf | sort -nr -k 3 | head -10;
-			   echo;  pause;;
-			4) netstat -s | less;;
-			5) break;;
-			*) Pause "Select between 1 to 5 only"
-		esac
+		echo
+		paths=(' ')
+		infos=('Exit')
+		i=0
+		for file in `find $DOTFILES_PATH_BOOT -type f -name "boot.ini"`; do
+			paths+=("dir${file%/*}")
+			infos+=("`cat $file`")
+			echo "${i}. ${infos[$i]}"
+			((i++))
+		done
+		printf "\n$(string.repeat "–" 80)\n\n"
+		read -r -n $(string.length $i) -p "Select an item {0..$((i-1))} » " val
+		echo
+		# match the regex and be a valid index to continue
+		[[ ! $val =~ ^[0-9]+ || $val -gt $((i-1)) ]] && continue
+		# if 0, break the loop
+		[[ $val == 0 ]] && break
+
+		echo ${paths[$val]}
+
 	done
 }
