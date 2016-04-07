@@ -5,7 +5,12 @@
 
 prefix=$(brew --prefix)
 
+
 export PATH=$prefix/bin:$prefix/sbin:$PATH
+
+# Enable bash completion
+sys.has_brew 'bash-completion' source $prefix/etc/bash_completion
+
 
 if sys.has_brew 'coreutils'; then
 	prefix=$(brew --prefix coreutils)
