@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
+! sys.is_darwin && log.error "$DOTFILES_PKG:406" && exit 1
+
+Packages=('nvm')
+brew.install Packages[@]

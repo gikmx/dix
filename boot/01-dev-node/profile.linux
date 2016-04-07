@@ -1,0 +1,10 @@
+#! /usr/bin/env bash
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
+! sys.is_linux && sys.error "$DOTFILES_PKG:406" && exit 1
+
+
+if [ ! -s "$NVM_DIR/nvm.sh" ]; then
+	log.error "$DOTFILES_PKG:NVM:404"
+else
+	source "$NVM_DIR/nvm.sh"
+fi
