@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
+! boot.pkg_exists '00-base' && "${DOTFILES_PKG}:BASE:403" && exit 1
+
+DOTFILES_ON_POSTINSTALL(){
+	boot.pkg_enable $DOTFILES_PKG
+}
+
+boot.head "Installing NVM"
