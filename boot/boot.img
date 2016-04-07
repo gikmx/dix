@@ -22,7 +22,6 @@ pushd $(dirname $0) > /dev/null
 
 popd > /dev/null
 
-
-source ~/.dotfiles || exit
+source $HOME/.dotfiles || exit 1
 
 boot.menu
