@@ -1,0 +1,4 @@
+#! /usr/bin/env bash
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
+
+boot.head "Removing Base"

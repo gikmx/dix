@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 ! $DOTFILES  && echo "Dotfiles is required."  && exit 1
-! sys.is_mac && log.error "Invalid platform." && exit 1
+! sys.is_darwin && log.error "Invalid platform." && exit 1
 
 log.info "Restoring bash ..."
 sudo chsh -s "/bin/bash"
@@ -14,8 +14,6 @@ log.info "Restoring permissions ..."
 sudo chmod 0755 /usr/local
 sudo chgrp wheel /usr/local
 
-reset
-source $DOTFILES_PATH_LIB/profile/env.sh
-hash -r # reload the hashtable so the paths are updated
-
-clear
+boot.pkg_disable "00-base"
+boot.reload
+boot.profile
