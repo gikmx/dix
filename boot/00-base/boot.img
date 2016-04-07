@@ -1,6 +1,4 @@
 #! /usr/bin/env bash
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
 
-[ ! -f $HOME/.dotfiles ] && echo "Dotfiles not installed" && exit
-[ -z "$DOTFILES" ] && source $HOME/.dotfiles
-
-boot.head "Installing Base Packages"
+boot.head "Installing Base"

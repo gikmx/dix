@@ -1,0 +1,29 @@
+#! /usr/bin/env bash
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
+! sys.is_arch && sys.error "406" && exit 1
+
+echo "Updating system and installing dependencies…"
+deps=(
+	'moreutils'
+	'dnsutils'
+	'git'
+	'wget'
+	'unzip'
+)
+sudo pacman -Syu --noconfirm ${deps[@]}
+
+# Set the author name
+tmp=$(whoami)
+read -p "Your name? [$tmp] " input
+[ -z "$input" ] && input=$tmp
+echo "$input" > $DOTFILES_PATH_SRV/GIT_AUTHOR_NAME
+
+# Set the author email
+tmp="$(whoami)@$(hostname)"
+read -p "Your email address? ["$tmp"]" input
+[ -z "$input" ] && name=$tmp
+echo "$input" > $DOTFILES_PATH_SRV/GIT_AUTHOR_EMAIL
+
+unset tmp, input
+
+boot.pkg_enable $DOTFILES_PKG
