@@ -20,9 +20,9 @@ boot.head(){
 boot.menu(){
 
 	# Capture cancellation signals so the user MUST input.
-	trap '' SIGINT
-	trap '' SIGQUIT
-	trap '' SIGTSTP
+	# trap '' SIGINT
+	# trap '' SIGQUIT
+	# trap '' SIGTSTP
 
 	while true; do
 		# show menu
