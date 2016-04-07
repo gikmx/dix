@@ -1,6 +1,5 @@
 #! /bin/usr/env bash
-
-[[ -z $DOTFILES ]] && source $HOME/.dotfiles
+[[ -z "$DOTFILES" ]] && source $HOME/.dotfiles
 
 if sys.is_linux; then
 	export LC_ALL=en_US.UTF-8
