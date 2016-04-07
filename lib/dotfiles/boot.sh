@@ -31,6 +31,10 @@ boot.profile(){
 		source "$dir/profile"
 		[ ! -f "$dir/profile.$(sys.name)" ] && continue
 		source "$dir/profile.$(sys.name)"
+		if type.is_func DOTFILES_ON_AFTER; then
+			DOTFILES_ON_AFTER $DOTFILES_PKG
+			unset DOTFILES_ON_AFTER
+		fi
 	done
 }
 
@@ -47,7 +51,6 @@ boot.pkg_enable(){
 	echo "$1" >> "$filename"
 	echo "`sort -u "$filename"`" > $filename
 	log.info "Enabled Package $1"
-	return 0
 }
 
 boot.pkg_disable(){
@@ -107,9 +110,9 @@ boot.menu(){
 			source ${paths[$val]}/boot.img.$(sys.name) || exit 1
 		fi
 
-		if type.is_func DOTFILES_ON_POSTINSTALL; then
-			DOTFILES_ON_POSTINSTALL $DOTFILES_PKG
-			unset DOTFILES_ON_POSTINSTALL
+		if type.is_func DOTFILES_ON_AFTER; then
+			DOTFILES_ON_AFTER $DOTFILES_PKG
+			unset DOTFILES_ON_AFTER
 		fi
 
 		unset DOTFILES_PKG
