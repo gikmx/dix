@@ -13,17 +13,10 @@ deps=(
 sudo pacman -Syu --noconfirm ${deps[@]}
 
 # Set the author name
-tmp=$(whoami)
-read -p "Your name? [$tmp] " input
-[ -z "$input" ] && input=$tmp
-echo "$input" > $DOTFILES_PATH_SRV/GIT_AUTHOR_NAME
-
-# Set the author email
-tmp="$(whoami)@$(hostname)"
-read -p "Your email address? ["$tmp"]" input
-[ -z "$input" ] && name=$tmp
-echo "$input" > $DOTFILES_PATH_SRV/GIT_AUTHOR_EMAIL
-
-unset tmp, input
-
-boot.pkg_enable $DOTFILES_PKG
+if [ ! -f $DOTFILES_PATH_SRV/GIT_AUTHOR_NAME ]; then
+    log.info "Configuring GIT Author Name ..."
+	tmp=$(whoami)
+	read -p "Your name? [$tmp] " input
+	[ -z "$input" ] && input=$tmp
+	echo "$input" > $DOTFILES_PATH_SRV/GIT_AUTHOR_NAME
+fi
