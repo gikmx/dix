@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
 
 # Install powerline fonts
 if [ ! -d $DOTFILES_LNK/fonts ]; then
