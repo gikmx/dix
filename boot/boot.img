@@ -2,8 +2,10 @@
 
 # Install the main dotfiles script
 pushd $(dirname $0) > /dev/null
+
     # The variable that rules them all.
     DOTFILES_PATH=$(pwd -P)
+
     # Set and store secondary environment variables
     DIRS=`find $DOTFILES_PATH -maxdepth 1 -type d ! -name ".*" ! -path $DOTFILES_PATH`
     for DIR in $DIRS; do
@@ -12,6 +14,7 @@ pushd $(dirname $0) > /dev/null
         # If non-existant, create a file for the environment variable
         echo "$DIR" > "$DOTFILES_PATH/srv/$NAME"
     done
+
     # Store the variables so the main script restores them
     echo "$DOTFILES_PATH" > $DOTFILES_PATH/srv/DOTFILES_PATH
     echo "$DOTFILES_PATH/lib/dotfiles" > $DOTFILES_PATH/srv/DOTFILES_PATH_SELF
@@ -24,4 +27,4 @@ popd > /dev/null
 
 source $HOME/.dotfiles || exit 1
 
-boot.menu
+boot.menu && clear
