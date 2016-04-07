@@ -19,8 +19,39 @@ boot.head(){
 
 boot.reload(){
 	reset
-	profile.reload
 	hash -r # reload the hashtable so the paths are updated
+}
+
+boot.profile(){
+	pkgs="`cat $DOTFILES_PATH_SRV/DOTFILES_PKGS`"
+	for pkg in ${pkgs[@]}; do
+		dir=$DOTFILES_PATH_BOOT/$pkg
+		[ ! -d $dir ] && log.error "PKG404:$pkg" && exit 1
+		[ ! -f "$dir/profile" ] && continue
+		source "$dir/profile"
+		[ ! -f "$dir/profile.$(sys.name)" ] && continue
+		source "$dir/profile.$(sys.name)"
+	done
+}
+
+boot.pkg_enable(){
+	[ -z "$1" ] && log.error "PKG406" && exit 1
+	local filename="$DOTFILES_PATH_SRV/DOTFILES_PKGS"
+	[ ! -f "$filename" ] && touch "$filename"
+	# Append the current package and remove duplicates
+	echo "$1" >> "$filename"
+	echo "`sort -u "$filename"`" > $filename
+	log.info "Enabled Package $1"
+	return 0
+}
+
+boot.pkg_disable(){
+	local filename="$DOTFILES_PATH_SRV/DOTFILES_PKGS"
+	[ ! -f "$filename" ] && touch "$filename"
+	[ -z "$1" ] && log.error "PKG406" && exit 1
+	# Outputs the inverse of the matched file
+	echo "$(sed  -n "/$1/!p" "$filename")" > "$filename"
+	log.info "Disabled Package $1"
 }
 
 boot.menu(){
@@ -42,16 +73,15 @@ boot.menu(){
 		echo "0. Exit"
 
 		i=1
-		for file in `find $DOTFILES_PATH_BOOT -type f -name "boot.ini"`; do
+		for file in `find $DOTFILES_PATH_BOOT -type f -name "boot.conf"`; do
 			paths+=("${file%/*}")
-			infos+=("`cat $file`")
+			infos+=("`source $file && echo $title`")
 			echo "$i. ${infos[$i]}"
 			((i++))
 		done
 
 		printf "\n$(string.repeat "–" 80)\n\n"
 		read -r -n $(string.length $i) -p "Select an item {0..$((i-1))} » " val
-		echo
 
 		# match the regex and be a valid index to continue
 		[[ ! $val =~ ^[0-9]+ || $val -gt $((i-1)) ]] && continue
@@ -60,14 +90,20 @@ boot.menu(){
 		[[ $val == 0 ]] && break
 		clear
 
+		# A boot.img must exist.
 		[ ! -f "${paths[$val]}/boot.img" ] && log.error "IMG404" && exit 1
-		source ${paths[$val]}/boot.img || exit 1
 
+		# Let the package know its name
+		DOTFILES_PKG="`basename ${paths[$val]}`"
+
+		# Load the common boot first, and then (if available) the system-specific one.
+		source ${paths[$val]}/boot.img || exit 1
 		if [ -f "${paths[$val]}/boot.img.$(sys.name)" ]; then
-			source ${paths[$val]}/boot-$(sys.name).img || exit 1
+			source ${paths[$val]}/boot.img.$(sys.name) || exit 1
 		fi
 
-		echo
+		unset DOTFILES_PKG
 		read -p "Done. Press [Enter] to continue ..."
+
 	done
 }

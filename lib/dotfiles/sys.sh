@@ -24,7 +24,7 @@ sys.is(){
 }
 
 # Test if current system is a mac
-sys.is_mac() {
+sys.is_darwin() {
 	sys.is 'Darwin'
 }
 
