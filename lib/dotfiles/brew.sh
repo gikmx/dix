@@ -5,7 +5,6 @@
 # $2: Has to be a function.
 brew.install(){
 	# TODO: Haven't found a way to validate the 1sr param.
-	! type.is_func  $2 && log.error "Expecting a function" && return 1
 
 	declare -a pkgs=("${!1}")
 	for pkg in "${pkgs[@]}"; do
@@ -15,6 +14,11 @@ brew.install(){
 		# Skip already-installed packages
 		sys.has_brew "$name" && continue
 		log.info "Installing $name"
-		TERM=xterm-256color brew install ${pkg[@]} && $2 $name
+		if type.is_func $2; then
+			TERM=xterm-256color brew install ${pkg[@]} && $2 $name
+		else
+			TERM=xterm-256color brew install ${pkg[@]}
+		fi
+
 	done
 }
