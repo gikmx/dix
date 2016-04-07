@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-[ -z "$DOTFILES" ] && echo "Invalid environment" && exit 1
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
 
 number.ceil(){
 	perl -we "use POSIX; print ceil($1), qq{\n}"
