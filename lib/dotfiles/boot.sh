@@ -34,8 +34,13 @@ boot.profile(){
 	done
 }
 
+boot.pkg_exists(){
+	[ -z "$1" ] && log.error "PKG_EXISTS_406" && return 1
+	! test -z "`grep "$1" "$DOTFILES_PATH_SRV/DOTFILES_PKGS"`"
+}
+
 boot.pkg_enable(){
-	[ -z "$1" ] && log.error "PKG406" && exit 1
+	[ -z "$1" ] && log.error "PKG_ENABLE_406" && exit 1
 	local filename="$DOTFILES_PATH_SRV/DOTFILES_PKGS"
 	[ ! -f "$filename" ] && touch "$filename"
 	# Append the current package and remove duplicates
@@ -48,7 +53,7 @@ boot.pkg_enable(){
 boot.pkg_disable(){
 	local filename="$DOTFILES_PATH_SRV/DOTFILES_PKGS"
 	[ ! -f "$filename" ] && touch "$filename"
-	[ -z "$1" ] && log.error "PKG406" && exit 1
+	[ -z "$1" ] && log.error "PKG_DISABLE_406" && exit 1
 	# Outputs the inverse of the matched file
 	echo "$(sed  -n "/$1/!p" "$filename")" > "$filename"
 	log.info "Disabled Package $1"
