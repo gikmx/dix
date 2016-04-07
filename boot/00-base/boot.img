@@ -3,4 +3,4 @@
 [ ! -f $HOME/.dotfiles ] && echo "Dotfiles not installed" && exit
 [ -z "$DOTFILES" ] && source $HOME/.dotfiles
 
-[ ! ]
+boot.head "Installing Base Packages"
