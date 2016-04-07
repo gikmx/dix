@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
-! $DOTFILES  && echo "Dotfiles is required."  && exit 1
-! sys.is_mac && log.error "Invalid platform." && exit 1
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
+! sys.is_darwin && sys.error "406" && exit 1
 
 # instead of a big list, run install for every package
 Packages=(
@@ -36,9 +36,7 @@ post(){
     log.info "Post installation for $1 ..."
 
     # Reload the environment after every installation
-    reset
-    source $DOTFILES_PATH_LIB/profile/env.sh
-    hash -r
+    boot.reload
     log.info "Installed $1"
 }
 
@@ -56,3 +54,21 @@ brew tap homebrew/dupes
 
 # Install packages and call 'post' after every successfull installation
 brew.install Packages[@] post
+
+log.info "Configuring GIT credentials ..."
+echo
+
+# Set the author name
+tmp=$(dscacheutil -q user -a name $(whoami) | fgrep gecos | sed -e 's/.*gecos: \(.*\)/\1/')
+read -p "Your name? [$tmp] " input
+[ -z "$input" ] && input=$tmp
+echo "$input" > $DOTFILES_PATH_SRV/GIT_AUTHOR_NAME
+
+# Set the author email
+tmp="$(whoami)@$(hostname)"
+read -p "Your email address? ["$tmp"]" input
+[ -z "$input" ] && name=$tmp
+echo "$input" > $DOTFILES_PATH_SRV/GIT_AUTHOR_EMAIL
+
+boot.pkg_enable $DOTFILES_PKG
+boot.profile

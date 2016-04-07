@@ -1,0 +1,11 @@
+#! /usr/bin/env bash
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
+
+if sys.has 'git'; then
+	# GIT_AUTHOR_* should be declared on $DOTFILES_PATH_SRV
+	export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
+	export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+fi
+
+export PATH=$DOTFILES_PATH_BIN:$PATH
+
