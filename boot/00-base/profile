@@ -9,3 +9,19 @@ fi
 
 export PATH=$DOTFILES_PATH_BIN:$PATH
 
+# Shell options
+shopt -s checkwinsize # check winsize after each command and adjust screen automatically,
+shopt -s nocaseglob   # case insensitive globbing
+shopt -s cdspell      # Autocorrect typos in path names when using cd
+shopt -s histappend   # Always append to history on login, don't replace it.
+
+# -------------------------------------------------------------------------------- History
+
+# cleanup the history file, by manually removing dups
+tac $HISTFILE | awk '!x[$0]++' | tac | sponge $HISTFILE
+
+# don't put duplicate lines in the history and erase those that already exist
+HISTCONTROL=erasedups:ignorespace
+
+# Cleanup history on every command
+PROMPT_COMMAND="history -n; history -w; history -c; history -r; $PROMPT_COMMAND"
