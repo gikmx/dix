@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
 
 # Ruby environment management.
 if $(has ruby); then
