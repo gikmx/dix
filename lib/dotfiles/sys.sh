@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-[ -z "$DOTFILES" ] && echo "Invalid enviromnent." && exit
+[ -z "$DOTFILES" ] && echo "Invalid environment" && exit 1
 
 # Get the current system name
 sys.name(){
@@ -15,7 +15,7 @@ sys.has(){
 sys.has_brew(){
 	! sys.has 'brew' && return 1               # no brew available
 	sys.has 'brew' && [ -z "$1" ] && return 0  # has brew, and no argument
-	test -d $(brew --prefix $1)                # do the actual test using brew
+	! test -z "`brew ls --versions $1`"
 }
 
 # Test current system
