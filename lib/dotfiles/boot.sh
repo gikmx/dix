@@ -102,6 +102,11 @@ boot.menu(){
 			source ${paths[$val]}/boot.img.$(sys.name) || exit 1
 		fi
 
+		if type.is_func DOTFILES_ON_POSTINSTALL; then
+			DOTFILES_ON_POSTINSTALL $DOTFILES_PKG
+			unset DOTFILES_ON_POSTINSTALL
+		fi
+
 		unset DOTFILES_PKG
 		read -p "Done. Press [Enter] to continue ..."
 
