@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
+! $DIX && >&2 echo "DIX404" && exit 1
 
 # $1: Has to be an array in this form Packages[@] (no $)
 # $2: Has to be a function.

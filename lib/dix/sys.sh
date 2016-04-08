@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-[ -z "$DOTFILES" ] && echo "Invalid environment" && exit 1
+[ -z "$DIX" ] && echo "Invalid environment" && exit 1
 
 # Get the current system name
 sys.name(){
