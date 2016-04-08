@@ -40,26 +40,9 @@ post(){
     log.info "Installed $1"
 }
 
-# If not available, install homebrew.
-if ! sys.has_brew; then
-    log.info "Installing Homebrew …"
-    url='https://raw.githubusercontent.com/Homebrew/install/master/install'
-    /usr/bin/ruby -e "$(curl -fsSL $url)" < /dev/null
-    unset url
-fi
-
 # Allow brew to download packages with duplicated system functionallity
 # that may provide more recent or bugfix versions.
 brew tap homebrew/dupes
 
 # Install packages and call 'post' after every successfull installation
 brew.install Packages[@] post
-
-if [ ! -f $DIX_PATH_SRV/GIT_AUTHOR_NAME ]; then
-    # Set the author name
-    log.info "Configuring GIT Author Name ..."
-    tmp=$(dscacheutil -q user -a name $(whoami) | fgrep gecos | sed -e 's/.*gecos: \(.*\)/\1/')
-    read -p "Your name? [$tmp] " input
-    [ -z "$input" ] && input=$tmp
-    echo "$input" > $DIX_PATH_SRV/GIT_AUTHOR_NAME
-fi

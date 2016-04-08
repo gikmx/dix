@@ -11,12 +11,3 @@ deps=(
 	'unzip'
 )
 sudo pacman -Syu --noconfirm ${deps[@]}
-
-# Set the author name
-if [ ! -f $DIX_PATH_SRV/GIT_AUTHOR_NAME ]; then
-    log.info "Configuring GIT Author Name ..."
-	tmp=$(whoami)
-	read -p "Your name? [$tmp] " input
-	[ -z "$input" ] && input=$tmp
-	echo "$input" > $DIX_PATH_SRV/GIT_AUTHOR_NAME
-fi
