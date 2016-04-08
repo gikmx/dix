@@ -2,7 +2,7 @@
 ! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
 
 boot.motd(){
-	cat $DOTFILES_PATH_LIB/boot/motd
+	cat $DOTFILES_PATH_LIB/dotfiles/motd
 	echo
 }
 
