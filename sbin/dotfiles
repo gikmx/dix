@@ -1,9 +1,8 @@
-#! /usr/env/bash
-
-[[ ! -L $HOME/.dotfiles ]] && >&2 echo "Install Dotfiles before running" && return 1
+#! /usr/bin/env bash
 
 # Determine the real path of the symlink and go up a dir until dotfiles is found.
-pushd `dirname $(perl -le "print readlink '${BASH_SOURCE[0]}'")` > /dev/null
+PWD=`dirname $(perl -le "use Cwd qw(realpath); print realpath('${BASH_SOURCE[0]}')")`
+pushd $PWD > /dev/null
 	while true; do
 		DOTFILES_PATH=`pwd -P`
 		[ -d ".git" ] && break
