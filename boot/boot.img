@@ -19,11 +19,21 @@ pushd $(dirname ${BASH_SOURCE[0]}) > /dev/null
     echo "$DOTFILES_PATH" > $DOTFILES_PATH/srv/DOTFILES_PATH
     echo "$DOTFILES_PATH/lib/dotfiles" > $DOTFILES_PATH/srv/DOTFILES_PATH_SELF
 
-    # This is it. install it to $HOME
+    # Make sure binaries are executable
+    dirs=("$DOTFILES_PATH/bin" "$DOTFILES_PATH/sbin")
+    for dir in ${dirs[@]}; do
+        find $dir ! -name "README.md" ! -path $dir -exec chmod +x {} \;
+    done
+
+    # This is it, Install dotfiles to $HOME
     rm -f $HOME/.dotfiles
     ln -sf $DOTFILES_PATH/sbin/dotfiles $HOME/.dotfiles
 
-popd > /dev/null
-source $HOME/.dotfiles || exit 1
+    $DOTFILES_PATH/sbin/dotfiles-rm
+    $DOTFILES_PATH/sbin/dotfiles-ln
 
+popd > /dev/null
+
+# Source the library and show menu
+source $HOME/.dotfiles || exit 1
 boot.menu && clear
