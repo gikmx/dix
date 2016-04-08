@@ -1,0 +1,11 @@
+#! /usr/bin/env bash
+! $DIX && >&2 echo "DIX404" && exit 1
+! sys.is_darwin && log.error "406" && exit 1
+
+# If not available, install homebrew.
+if ! sys.has_brew; then
+    log.info "Installing Homebrew …"
+    url='https://raw.githubusercontent.com/Homebrew/install/master/install'
+    /usr/bin/ruby -e "$(curl -fsSL $url)" < /dev/null
+    unset url
+fi
