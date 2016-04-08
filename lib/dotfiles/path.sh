@@ -1,7 +1,7 @@
 
-path.readlink() {
+path.real() {
     [ -z "$1" ] && return 1
-    perl -le "print readlink '$1'"
+    perl -le "use Cwd qw(realpath); print realpath('$1')"
 }
 
 path.relative(){
