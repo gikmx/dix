@@ -1,12 +1,9 @@
 #! /usr/env/bash
 
-# Returns the real path of a symbolic link.
-ls.readlink() {
-    [ ! -z "$1" ] && echo $(src=$1 perl -le 'print readlink $ENV{src}')
-}
-# TODO: Validate that dotfiles are actually a sym
+[[ ! -L $HOME/.dotfiles ]] && >&2 echo "Install Dotfiles before running" && return 1
+
 # Determine the real path of the symlink and go up a dir until dotfiles is found.
-pushd `dirname $(ls.readlink ${BASH_SOURCE[0]})` > /dev/null
+pushd `dirname $(perl -le "print readlink '${BASH_SOURCE[0]}'")` > /dev/null
 	while true; do
 		DOTFILES_PATH=`pwd -P`
 		[ -d ".git" ] && break
@@ -14,23 +11,16 @@ pushd `dirname $(ls.readlink ${BASH_SOURCE[0]})` > /dev/null
 	done
 popd > /dev/null
 
-# Returns all valid files on dotfiles/srv
-ls.path_srv() {
-    find $DOTFILES_PATH/srv -maxdepth 1 -type f ! -name "README.md"
-}
-
 # Populate the environment
-for path in `ls.path_srv`; do declare -x "`basename $path`"="`cat $path`"; done
+paths=$(find $DOTFILES_PATH/srv -maxdepth 1 -type f ! -name "README.md")
+for path in ${paths[@]}; do declare -x "`basename $path`"="`cat $path`"; done
 
-# Returns all valid files on the same directory as this file
-ls.path_self(){
-    find $DOTFILES_PATH_SELF -maxdepth 1 -type f -name "*.sh"
-}
 # Allow scripts to validate if this was already loaded
 DOTFILES=true
 
 # load utilities
-for path in `ls.path_self`; do source "$path"; done
+paths=$(find $DOTFILES_PATH_SELF -maxdepth 1 -type f -name "*.sh")
+for path in ${paths[@]}; do source "$path"; done
 
 # clear unneeded variables
-unset path
+unset paths
