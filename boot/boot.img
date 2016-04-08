@@ -1,39 +1,39 @@
 #! /usr/bin/env bash
 
-# Install the main dotfiles script
+# Install the main dix script
 pushd $(dirname ${BASH_SOURCE[0]}) > /dev/null
 
     # The variable that rules them all.
-    DOTFILES_PATH=$(pwd -P)
+    DIX_PATH=$(pwd -P)
 
     # Set and store secondary environment variables
-    DIRS=`find $DOTFILES_PATH -maxdepth 1 -type d ! -name ".*" ! -path $DOTFILES_PATH`
+    DIRS=`find $DIX_PATH -maxdepth 1 -type d ! -name ".*" ! -path $DIX_PATH`
     for DIR in ${DIRS[@]}; do
         # Get the name of the dir and convert it to uppercase.
-        NAME=DOTFILES_PATH_`basename $DIR | tr '[:lower:]' '[:upper:]'`
+        NAME=DIX_PATH_`basename $DIR | tr '[:lower:]' '[:upper:]'`
         # If non-existant, create a file for the environment variable
-        echo "$DIR" > "$DOTFILES_PATH/srv/$NAME"
+        echo "$DIR" > "$DIX_PATH/srv/$NAME"
     done
 
     # Store the variables so the main script restores them
-    echo "$DOTFILES_PATH" > $DOTFILES_PATH/srv/DOTFILES_PATH
-    echo "$DOTFILES_PATH/lib/dotfiles" > $DOTFILES_PATH/srv/DOTFILES_PATH_SELF
+    echo "$DIX_PATH" > $DIX_PATH/srv/DIX_PATH
+    echo "$DIX_PATH/lib/dix" > $DIX_PATH/srv/DIX_PATH_SELF
 
     # Make sure binaries are executable
-    dirs=("$DOTFILES_PATH/bin" "$DOTFILES_PATH/sbin")
+    dirs=("$DIX_PATH/bin" "$DIX_PATH/sbin")
     for dir in ${dirs[@]}; do
         find $dir ! -name "README.md" ! -path $dir -exec chmod +x {} \;
     done
 
-    # This is it, Install dotfiles to $HOME
-    rm -f $HOME/.dotfiles
-    ln -sf $DOTFILES_PATH/sbin/dotfiles $HOME/.dotfiles
+    # This is it, Install dix to $HOME
+    rm -f $HOME/.dix
+    ln -sf $DIX_PATH/sbin/dix $HOME/.dix
 
-    $DOTFILES_PATH/sbin/dotfiles-rm
-    $DOTFILES_PATH/sbin/dotfiles-ln
+    $DIX_PATH/sbin/dix-rm
+    $DIX_PATH/sbin/dix-ln
 
 popd > /dev/null
 
 # Source the library and show menu
-source $HOME/.dotfiles || exit 1
+source $HOME/.dix || exit 1
 boot.menu && clear

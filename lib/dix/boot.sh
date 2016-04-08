@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
-! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
+! $DIX && >&2 echo "DIX404" && exit 1
 
 boot.motd(){
-	cat $DOTFILES_PATH_LIB/dotfiles/motd
+	cat $DIX_PATH_LIB/dix/motd
 	echo
 }
 
@@ -23,32 +23,32 @@ boot.reload(){
 }
 
 boot.profile(){
-	pkgs="`cat $DOTFILES_PATH_SRV/DOTFILES_PKGS`"
+	pkgs="`cat $DIX_PATH_SRV/DIX_PKGS`"
 
-	export PATH=$DOTFILES_PATH_BIN:$DOTFILES_PATH_SBIN:$PATH
+	export PATH=$DIX_PATH_BIN:$DIX_PATH_SBIN:$PATH
 
 	for pkg in ${pkgs[@]}; do
-		dir=$DOTFILES_PATH_BOOT/$pkg
+		dir=$DIX_PATH_BOOT/$pkg
 		[ ! -d $dir ] && log.error "PKG404:$pkg" && exit 1
 		[ ! -f "$dir/profile" ] && continue
 		source "$dir/profile"
 		[ ! -f "$dir/profile.$(sys.name)" ] && continue
 		source "$dir/profile.$(sys.name)"
-		if type.is_func DOTFILES_ON_AFTER; then
-			DOTFILES_ON_AFTER $DOTFILES_PKG
-			unset DOTFILES_ON_AFTER
+		if type.is_func DIX_ON_AFTER; then
+			DIX_ON_AFTER $DIX_PKG
+			unset DIX_ON_AFTER
 		fi
 	done
 }
 
 boot.pkg_exists(){
 	[ -z "$1" ] && log.error "PKG_EXISTS_406" && return 1
-	! test -z "`grep "$1" "$DOTFILES_PATH_SRV/DOTFILES_PKGS"`"
+	! test -z "`grep "$1" "$DIX_PATH_SRV/DIX_PKGS"`"
 }
 
 boot.pkg_enable(){
 	[ -z "$1" ] && log.error "PKG_ENABLE_406" && exit 1
-	local filename="$DOTFILES_PATH_SRV/DOTFILES_PKGS"
+	local filename="$DIX_PATH_SRV/DIX_PKGS"
 	[ ! -f "$filename" ] && touch "$filename"
 	# Append the current package and remove duplicates
 	echo "$1" >> "$filename"
@@ -57,7 +57,7 @@ boot.pkg_enable(){
 }
 
 boot.pkg_disable(){
-	local filename="$DOTFILES_PATH_SRV/DOTFILES_PKGS"
+	local filename="$DIX_PATH_SRV/DIX_PKGS"
 	[ ! -f "$filename" ] && touch "$filename"
 	[ -z "$1" ] && log.error "PKG_DISABLE_406" && exit 1
 	# Outputs the inverse of the matched file
@@ -84,7 +84,7 @@ boot.menu(){
 		echo "0. Exit"
 
 		i=1
-		for file in `find $DOTFILES_PATH_BOOT -type f -name "boot.conf"`; do
+		for file in `find $DIX_PATH_BOOT -type f -name "boot.conf"`; do
 			paths+=("${file%/*}")
 			infos+=("`source $file && echo $title`")
 			echo "$i. ${infos[$i]}"
@@ -105,7 +105,7 @@ boot.menu(){
 		[ ! -f "${paths[$val]}/boot.img" ] && log.error "IMG404" && exit 1
 
 		# Let the package know its name
-		DOTFILES_PKG="`basename ${paths[$val]}`"
+		DIX_PKG="`basename ${paths[$val]}`"
 
 		# Load the common boot first, and then (if available) the system-specific one.
 		source ${paths[$val]}/boot.img || exit 1
@@ -113,12 +113,12 @@ boot.menu(){
 			source ${paths[$val]}/boot.img.$(sys.name) || exit 1
 		fi
 
-		if type.is_func DOTFILES_ON_AFTER; then
-			DOTFILES_ON_AFTER $DOTFILES_PKG
-			unset DOTFILES_ON_AFTER
+		if type.is_func DIX_ON_AFTER; then
+			DIX_ON_AFTER $DIX_PKG
+			unset DIX_ON_AFTER
 		fi
 
-		unset DOTFILES_PKG
+		unset DIX_PKG
 		boot.profile
 
 		read -p "Done. Press [Enter] to continue ..."

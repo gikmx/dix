@@ -1,11 +1,11 @@
 #! /usr/bin/env bash
 [[ "${BASH_SOURCE[0]}" != "${0}" ]] && >&2 echo "Sourcing disabled" && exit 1
-[[ ! $DOTFILES ]] && source $HOME/.dotfiles
+[[ ! $DIX ]] && source $HOME/.dix
 
-relpath=$(path.relative $DOTFILES_PATH_ETC $HOME)
-dotfiles=`find $DOTFILES_PATH_ETC -maxdepth 1 ! -path $DOTFILES_PATH_ETC ! -name 'README.md'`
+relpath=$(path.relative $DIX_PATH_ETC $HOME)
+dix=`find $DIX_PATH_ETC -maxdepth 1 ! -path $DIX_PATH_ETC ! -name 'README.md'`
 
-for dotfile in ${dotfiles[@]}; do
+for dotfile in ${dix[@]}; do
     back=''
     name=$(basename $dotfile)
     path=$HOME/.$name
@@ -14,7 +14,7 @@ for dotfile in ${dotfiles[@]}; do
     if [[ -e $path ]]; then
 
         # Is this one of our symlinks?
-        [[ "$(dirname `path.real $path`)" == "$DOTFILES_PATH_ETC" ]] && continue
+        [[ "$(dirname `path.real $path`)" == "$DIX_PATH_ETC" ]] && continue
 
         # not ours, back it up
         mv $path $HOME/$name.bak

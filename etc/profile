@@ -1,7 +1,7 @@
 [[ $- != *i* ]] && return
 
-[ ! -f $HOME/.dotfiles ] && echo "Please, Install Dotfiles" && return
-source $HOME/.dotfiles || return 1
+[ ! -f $HOME/.dix ] && echo "Please, Install Dotfiles" && return
+source $HOME/.dix || return 1
 
 boot.profile
 
@@ -16,7 +16,7 @@ boot.profile
 # # Set the default prompt
 # export PS1='\[\033[01;30m\]\h \[\033[01;34m\]\w\[\033[00m\]\n\$ '
 # # Prepend git branch name on command prompt.
-# # [ -r "$DOTFILES_LIB/gitprompt.sh" ] && source "$DOTFILES_LIB/gitprompt.sh"
+# # [ -r "$DIX_LIB/gitprompt.sh" ] && source "$DIX_LIB/gitprompt.sh"
 
 # # set file colors
 # eval `dircolors $HOME/.dir_colors`

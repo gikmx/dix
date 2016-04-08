@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
+! $DIX && >&2 echo "DIX404" && exit 1
 ! sys.is_linux && sys.error "406" && exit 1
 
 export LC_ALL=en_US.UTF-8

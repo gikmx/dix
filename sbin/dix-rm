@@ -1,0 +1,12 @@
+#! /usr/bin/env bash
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] && >&2 echo "Sourcing disabled" && exit 1
+[[ ! $DIX ]] && source $HOME/.dix
+
+dix=`find $DIX_PATH_ETC -maxdepth 1 ! -path $DIX_PATH_ETC ! -name 'README.md'`
+for dotfile in ${dix[@]}; do
+	name=$(basename $dotfile)
+	path=$HOME/.$name
+	real=$(dirname `path.real $path`)
+	[[ ! -L "$path" || "$real" != "$DIX_PATH_ETC"  ]] && continue
+	rm -Rf $path && log.info "Removed $name"
+done

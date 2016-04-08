@@ -1,9 +1,9 @@
 #! /bin/bash
 
 # Sources utils only if they are not already available
-[[ ! $DOTFILES_LIB ]] && echo >&2 "Expecting DOTFILES environment" && exit 1
+[[ ! $DIX_LIB ]] && echo >&2 "Expecting DIX environment" && exit 1
 
-source $DOTFILES_LIB/utils.sh
+source $DIX_LIB/utils.sh
 
 # are we in a repo?
 if ! isGIT; then

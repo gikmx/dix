@@ -6,8 +6,8 @@ export TMUX_POWERLINE_PATCHED_FONT_IN_USE="true" # Is a powerline font ready?
 # --------------------------------------------------------------------------------- Theme
 
 export TMUX_POWERLINE_THEME="etor"
-export TMUX_POWERLINE_DIR_USER_THEMES="$DOTFILES_LNK/tmux-powerline/themes"
-export TMUX_POWERLINE_DIR_USER_SEGMENTS="$DOTFILES_LNK/tmux-powerline/segments"
+export TMUX_POWERLINE_DIR_USER_THEMES="$DIX_LNK/tmux-powerline/themes"
+export TMUX_POWERLINE_DIR_USER_SEGMENTS="$DIX_LNK/tmux-powerline/segments"
 
 # ------------------------------------------------------------------------------ Segments
 
