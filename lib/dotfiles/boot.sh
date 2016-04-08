@@ -116,6 +116,8 @@ boot.menu(){
 		fi
 
 		unset DOTFILES_PKG
+		boot.profile
+
 		read -p "Done. Press [Enter] to continue ..."
 
 	done
