@@ -1,13 +1,30 @@
-#!/bin/bash
+#! /usr/bin/env bash
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] && >&2 echo "Sourcing disabled" && exit 1
+[[ ! $DOTFILES ]] && source $HOME/.dotfiles
 
-# Sources utils only if they are available
-[[ ! $DOTFILES_LIB ]] && echo >&2 "Expecting DOTFILES environment" && exit 1
-source "$DOTFILES_LIB/utils.sh"
+relpath=$(path.relative $DOTFILES_PATH_ETC $HOME)
+dotfiles=`find $DOTFILES_PATH_ETC -maxdepth 1 ! -path $DOTFILES_PATH_ETC ! -name 'README.md'`
 
-for dotfile in `find $DOTFILES_LNK -maxdepth 1 -name ".*"`; do
-    dotfile=`basename ${dotfile/$DOTFILES_LNK\//}`
-    rm -Rf $HOME/$dotfile
-    dotfile_path=${DOTFILES_LNK/$HOME\//}
-    cd $HOME
-    ln -s "$dotfile_path/$dotfile" "./$dotfile"
+for dotfile in ${dotfiles[@]}; do
+    back=''
+    name=$(basename $dotfile)
+    path=$HOME/.$name
+
+    # Detect if there's a file already there
+    if [[ -e $path ]]; then
+
+        # Is this one of our symlinks?
+        [[ "$(dirname `path.real $path`)" == "$DOTFILES_PATH_ETC" ]] && continue
+
+        # not ours, back it up
+        mv $path $HOME/$name.bak
+        back=true
+    fi
+
+    # Relative-Symlink the bastard
+    pushd "$HOME" > /dev/null
+        ln -s $relpath/$name  ".$name"
+    popd > /dev/null
+    log.info "Symlinked $([ $back ] && printf '(existing) ') $name"
+
 done
