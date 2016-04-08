@@ -1,32 +1,31 @@
 #! /usr/bin/env bash
+! $DOTFILES && >&2 echo "DOTFILES404" && exit 1
+! boot.pkg_exists '00-base' && "${DOTFILES_PKG}:BASE:403" && exit 1
 
-for dotfile in $(dotfiles $DOTFILES_SRC); do
-    BACKUP=false
+relpath=$(path.relative $DOTFILES_PATH_ETC $HOME)
 
-    dotfile_path=~/.$dotfile
+dotfiles=`find $DOTFILES_PATH_ETC -maxdepth 1 ! -path $DOTFILES_PATH_ETC ! -name 'README.md'`
+for dotfile in ${dotfiles[@]}; do
+    back=false
+    name=$(basename $dotfile)
+    path=$HOME/.$name
 
-    # Detect if there's a file already there and take action on i.
-    if [[ -e $dotfile_path ]]; then
+    # Detect if there's a file already there
+    if [[ -e $path ]]; then
 
-        # is it a symlink pointing to this dotfiles? skip it
-        if [ -L $dotfile_path -a $(getLinkPath $dotfile_path) = "$DOTFILES_SRC" ]; then
-            echo "Skipping: $dotfile"
+        # Skip if the symlink is ours
+        [[ -L "$path" && "$(dirname `path.readlink $path`)" == $DOTFILES_PATH_ETC ]] &&\
             continue
-        fi
 
-        # ok, dotfile is not ours, back it up & move it out
-        mv $dotfile_path $dotfile_path.bak
-        BACKUP=true
+        # not ours, back it up
+        mv $path $path.bak
+        back=true
     fi
 
-    # create the symlink, but be relative about it.
-    cd $HOME
-    ln -s ${DOTFILES_SRC/$HOME\//}/$dotfile ./.$dotfile
+    # Relative-Symlink the bastard
+    pushd "$HOME" > /dev/null
+        ln -s $relpath/$name  ".$name"
+    popd > /dev/null
 
-    # OCT is my burden
-    isDarwin  && /bin/chmod -h 700 ./.$dotfile
-
-    printf "Symlinked $dotfile. "
-    $BACKUP &&  printf "[backed up]"
-    echo # echoes a blank line no matter what
+    log.info "Symlinked $name $(test $back && echo "[Backed up existing]")"
 done
