@@ -24,6 +24,9 @@ boot.reload(){
 
 boot.profile(){
 	pkgs="`cat $DOTFILES_PATH_SRV/DOTFILES_PKGS`"
+
+	export PATH=$DOTFILES_PATH_BIN:$DOTFILES_PATH_SBIN:$PATH
+
 	for pkg in ${pkgs[@]}; do
 		dir=$DOTFILES_PATH_BOOT/$pkg
 		[ ! -d $dir ] && log.error "PKG404:$pkg" && exit 1
