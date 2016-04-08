@@ -4,13 +4,12 @@
 ls.readlink() {
     [ ! -z "$1" ] && echo $(src=$1 perl -le 'print readlink $ENV{src}')
 }
-
 # TODO: Validate that dotfiles are actually a sym
 # Determine the real path of the symlink and go up a dir until dotfiles is found.
 pushd `dirname $(ls.readlink ${BASH_SOURCE[0]})` > /dev/null
 	while true; do
 		DOTFILES_PATH=`pwd -P`
-		[ $(basename $DOTFILES_PATH) = 'dotfiles' ] && break
+		[ -d ".git" ] && break
 		cd ..
 	done
 popd > /dev/null
