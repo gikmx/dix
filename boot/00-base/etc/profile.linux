@@ -1,6 +1,0 @@
-#! /usr/bin/env bash
-! $DIX && >&2 echo "DIX404" && exit 1
-! sys.is_linux && sys.error "406" && exit 1
-
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8

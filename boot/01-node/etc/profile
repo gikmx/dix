@@ -1,5 +1,0 @@
-#! /usr/bin/env bash
-! $DIX && >&2 echo "DIX404" && exit 1
-
-# Environment variables
-export NVM_DIR=$HOME/.nvm

@@ -1,4 +1,0 @@
-set -o vi             # Enable vi mode
-
-# Enables gruvbox's color palette to exactly match theme colors
-source ~/.vim/bundle/gruvbox/gruvbox_256palette_osx.sh
