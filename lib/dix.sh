@@ -1,6 +1,16 @@
 #! /usr/bin/env bash
 ! $DIX && >&2 echo "DIX404" && exit 1
 
+# TODO: Reimplement this
+# $DIX_PATH/sbin/dix-rm
+# $DIX_PATH/sbin/dix-ln
+
+# # Make sure binaries are executable
+# dirs=("$DIX_PATH/bin" "$DIX_PATH/sbin")
+# for dir in ${dirs[@]}; do
+#     find $dir ! -name "README.md" ! -path $dir -exec chmod +x {} \;
+# done
+
 boot.motd(){
 	cat $DIX_PATH_LIB/dix/motd
 	echo
