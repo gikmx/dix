@@ -1,25 +1,30 @@
 #! /usr/bin/env bash
 
-# Determine the real path of the symlink and go up a dir until dix is found.
-PWD=`dirname $(perl -le "use Cwd qw(realpath); print realpath('${BASH_SOURCE[0]}')")`
-pushd $PWD > /dev/null
-	while true; do
-		DIX_PATH=`pwd -P`
-		[ -d ".git" ] && break
-		cd ..
-	done
+# Install the main dix script
+pushd $(dirname ${BASH_SOURCE[0]}) > /dev/null
+
+    # The variable that rules them all.
+    DIX_PATH=$(pwd -P)
+
+    # Set and store  environment variables
+    DIRS=`find $DIX_PATH -maxdepth 1 -type d ! -name ".*" ! -path $DIX_PATH`
+    for DIR in ${DIRS[@]}; do
+        # Get the name of the dir and convert it to uppercase.
+        NAME=DIX_PATH_`basename $DIR | tr '[:lower:]' '[:upper:]'`
+        # If non-existant, create a file for the environment variable
+        echo "$DIR" > "$DIX_PATH/srv/$NAME"
+    done
+
+    # Store the variables so the main script restores them
+    echo "$DIX_PATH" > $DIX_PATH/srv/DIX_PATH
+    echo "$DIX_PATH/lib/dix/dix.sh" > $DIX_PATH/srv/DIX_PATH_SELF
+
+    # This is it, Install dix to $HOME
+    rm -f $HOME/.dix
+    ln -sf $DIX_PATH/sbin/dix $HOME/.dix
+
 popd > /dev/null
 
-# Populate the environment
-paths=$(find $DIX_PATH/srv -maxdepth 1 -type f ! -name "README.md")
-for path in ${paths[@]}; do declare -x "`basename $path`"="`cat $path`"; done
-
-# Allow scripts to validate if this was already loaded
-DIX=true
-
-# load utilities
-paths=$(find $DIX_PATH_SELF -maxdepth 1 -type f -name "*.sh")
-for path in ${paths[@]}; do source "$path"; done
-
-# clear unneeded variables
-unset paths
+# Source the library and show menu
+source $HOME/.dix || exit 1
+dix.menu && clear
