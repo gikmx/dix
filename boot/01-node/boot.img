@@ -1,9 +1,0 @@
-#! /usr/bin/env bash
-! $DIX && >&2 echo "DIX404" && exit 1
-! boot.pkg_exists '00-base' && "${DIX_PKG}:BASE:403" && exit 1
-
-DIX_ON_AFTER(){
-	boot.pkg_enable $DIX_PKG
-}
-
-boot.head "Installing NVM"

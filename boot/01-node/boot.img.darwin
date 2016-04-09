@@ -1,6 +1,0 @@
-#! /usr/bin/env bash
-! $DIX && >&2 echo "DIX404" && exit 1
-! sys.is_darwin && log.error "$DIX_PKG:406" && exit 1
-
-Packages=('nvm')
-brew.install Packages[@]

@@ -1,4 +1,0 @@
-#! /usr/bin/env bash
-! $DIX && >&2 echo "DIX404" && exit 1
-
-boot.head "Removing Base"
