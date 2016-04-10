@@ -1,38 +1,55 @@
 #! /usr/bin/env bash
-! $DIX && >&2 echo "DIX404" && exit 1
 
-# TODO: Reimplement this
-# $DIX_PATH/sbin/dix-rm
-# $DIX_PATH/sbin/dix-ln
+# DIX_PATH might be set if this is being sourced from /sbin/dix
+# if not, then determine the real path of this file and set DIX_PATH
+if [[ -z "$DIX_PATH" ]]; then
+	PWD=`dirname $(perl -le "use Cwd qw(realpath); print realpath('${BASH_SOURCE[0]}')")`
+	pushd $PWD > /dev/null
+		while true; do
+			DIX_PATH=`pwd -P`
+			[ -d ".git" ] && break
+			cd ..
+		done
+	popd > /dev/null
+fi
 
-# # Make sure binaries are executable
-# dirs=("$DIX_PATH/bin" "$DIX_PATH/sbin")
-# for dir in ${dirs[@]}; do
-#     find $dir ! -name "README.md" ! -path $dir -exec chmod +x {} \;
-# done
-
-boot.motd(){
-	cat $DIX_PATH_LIB/dix/motd
-	echo
+# Convert directories in $1 into files in $2
+dix.env_set(){
+	[[ ! $1 || ! $2 ]] && >&2 echo "ERR:dix.set_srv" && exit 1
+	local path name
+	# Set the path environment variables
+	for path in `find $1 -maxdepth 1 -type d ! -name ".*" ! -path $1`; do
+	    name="DIX_PATH_`basename $path | tr '[:lower:]' '[:upper:]'`"
+	    echo "$path" > "$2/$name"
+	done
+	echo "$DIX_PATH" > "$2/DIX_PATH"
 }
 
-boot.head(){
-	[ ! -z ]
-	local title=$1
-	local fillr="–"
-	local width=80
-	local space=`number.ceil $(number.math "($width-$(string.length "$title"))/2")`
-	string.repeat "–" $width && printf "\n"
-	string.repeat " " $space && printf "$(string.upper "$title")\n"
-	string.repeat "–" $width && printf "\n"
+# Populates the environment using files on $1
+dix.env(){
+	[ ! $1 ] && >&2 echo "dix.srv:404" && exit 1
+	local name
+	for path in $(find $1 -maxdepth 1 -type f ! -name "README.md"); do
+		name="`basename $path`"
+		export $name="`cat $path`"
+	done
 }
 
-boot.reload(){
-	reset
-	hash -r # reload the hashtable so the paths are updated
+# load libraries on $1
+dix.lib(){
+	[ ! $1 ] && >&2 echo "dix.srv:404" && exit 1
+	for DIX_LIB_PATH in $(find $1 -type f -name "*.sh" ! -name "dix.sh"); do
+		DIX_LIB_NAME=`basename $DIX_LIB_PATH`
+		DIX_LIB_NAME=${DIX_LIB_NAME/.sh}
+		DIX_LIB=`dirname $DIX_LIB_PATH`
+		DIX_LIB=${DIX_LIB/$1}
+		source "$DIX_LIB_PATH"
+		unset DIX_LIB_PATH DIX_LIB_NAME DIX_LIB
+	done
 }
 
-boot.profile(){
+# TODO:
+dix.dotfiles(){
 	pkgs="`cat $DIX_PATH_SRV/DIX_PKGS`"
 
 	export PATH=$DIX_PATH_BIN:$DIX_PATH_SBIN:$PATH
@@ -51,87 +68,11 @@ boot.profile(){
 	done
 }
 
-boot.pkg_exists(){
-	[ -z "$1" ] && log.error "PKG_EXISTS_406" && return 1
-	! test -z "`grep "$1" "$DIX_PATH_SRV/DIX_PKGS"`"
+dix.load(){
+	dix.env $DIX_PATH/srv
+	dix.lib $DIX_PATH/lib
+	# dix.etc $DIX_PATH/etc
 }
 
-boot.pkg_enable(){
-	[ -z "$1" ] && log.error "PKG_ENABLE_406" && exit 1
-	local filename="$DIX_PATH_SRV/DIX_PKGS"
-	[ ! -f "$filename" ] && touch "$filename"
-	# Append the current package and remove duplicates
-	echo "$1" >> "$filename"
-	echo "`sort -u "$filename"`" > $filename
-	log.info "Enabled Package $1"
-}
-
-boot.pkg_disable(){
-	local filename="$DIX_PATH_SRV/DIX_PKGS"
-	[ ! -f "$filename" ] && touch "$filename"
-	[ -z "$1" ] && log.error "PKG_DISABLE_406" && exit 1
-	# Outputs the inverse of the matched file
-	echo "$(sed  -n "/$1/!p" "$filename")" > "$filename"
-	log.info "Disabled Package $1"
-}
-
-boot.menu(){
-
-	# Capture cancellation signals so the user MUST input.
-	# trap '' SIGINT
-	# trap '' SIGQUIT
-	# trap '' SIGTSTP
-
-	while true; do
-		# show menu
-		clear
-		boot.motd
-		boot.head "Main Menu"
-		echo
-
-		paths=(true)
-		infos=(true)
-		echo "0. Exit"
-
-		i=1
-		for file in `find $DIX_PATH_BOOT -type f -name "boot.conf"`; do
-			paths+=("${file%/*}")
-			infos+=("`source $file && echo $title`")
-			echo "$i. ${infos[$i]}"
-			((i++))
-		done
-
-		printf "\n$(string.repeat "–" 80)\n\n"
-		read -r -n $(string.length $i) -p "Select an item {0..$((i-1))} » " val
-
-		# match the regex and be a valid index to continue
-		[[ ! $val =~ ^[0-9]+ || $val -gt $((i-1)) ]] && continue
-
-		# if 0, break the loop
-		[[ $val == 0 ]] && break
-		clear
-
-		# A boot.img must exist.
-		[ ! -f "${paths[$val]}/boot.img" ] && log.error "IMG404" && exit 1
-
-		# Let the package know its name
-		DIX_PKG="`basename ${paths[$val]}`"
-
-		# Load the common boot first, and then (if available) the system-specific one.
-		source ${paths[$val]}/boot.img || exit 1
-		if [ -f "${paths[$val]}/boot.img.$(sys.name)" ]; then
-			source ${paths[$val]}/boot.img.$(sys.name) || exit 1
-		fi
-
-		if type.is_func DIX_ON_AFTER; then
-			DIX_ON_AFTER $DIX_PKG
-			unset DIX_ON_AFTER
-		fi
-
-		unset DIX_PKG
-		boot.profile
-
-		read -p "Done. Press [Enter] to continue ..."
-
-	done
-}
+# Let everyone know that dix is ready to work
+DIX=true
