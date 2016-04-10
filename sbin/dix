@@ -1,30 +1,73 @@
 #! /usr/bin/env bash
 
-# Install the main dix script
+# Determine the correct script location and set minimal variables
 pushd $(dirname ${BASH_SOURCE[0]}) > /dev/null
-
-    # The variable that rules them all.
     DIX_PATH=$(pwd -P)
-
-    # Set and store  environment variables
-    DIRS=`find $DIX_PATH -maxdepth 1 -type d ! -name ".*" ! -path $DIX_PATH`
-    for DIR in ${DIRS[@]}; do
-        # Get the name of the dir and convert it to uppercase.
-        NAME=DIX_PATH_`basename $DIR | tr '[:lower:]' '[:upper:]'`
-        # If non-existant, create a file for the environment variable
-        echo "$DIR" > "$DIX_PATH/srv/$NAME"
-    done
-
-    # Store the variables so the main script restores them
-    echo "$DIX_PATH" > $DIX_PATH/srv/DIX_PATH
-    echo "$DIX_PATH/lib/dix/dix.sh" > $DIX_PATH/srv/DIX_PATH_SELF
-
-    # This is it, Install dix to $HOME
-    rm -f $HOME/.dix
-    ln -sf $DIX_PATH/sbin/dix $HOME/.dix
-
 popd > /dev/null
 
-# Source the library and show menu
-source $HOME/.dix || exit 1
-dix.menu && clear
+# Source the library
+source $DIX_PATH/lib/dix.sh || exit 1
+
+# set the environment and then load dix.
+dix.env_set $DIX_PATH $DIX_PATH/srv
+dix.load
+
+# # Capture cancellation signals
+# # TODO: Is this a good idea?, don't think so.
+# trap '' SIGINT
+# trap '' SIGQUIT
+# trap '' SIGTSTP
+
+while true; do
+    # show menu
+    clear
+    show.dix
+    show.title "Select an option"
+    echo
+
+    paths=(true)
+    infos=(true)
+
+    i=1
+    echo "0. Exit"
+    for file in `find $DIX_PATH_BOOT -type f -name "boot.conf"`; do
+        paths+=("${file%/*}")
+        infos+=("`source $file && echo $title`")
+        echo "$i. ${infos[$i]}"
+        ((i++))
+    done
+
+    show.title " "
+    read -r -n $(string.length $i) -p " {0..$((i-1))} » " val
+
+    # match the regex and be a valid index to continue
+    [[ ! $val =~ ^[0-9]+ || $val -gt $((i-1)) ]] && continue
+
+    # if 0, break the loop
+    [[ $val == 0 ]] && break
+    clear
+
+    # A boot.img must exist.
+    [ ! -f "${paths[$val]}/boot.img" ] && log.error "IMG404" && exit 1
+
+    # Let the package know its name
+    DIX_PKG="`basename ${paths[$val]}`"
+
+    # Load the common boot first, and then (if available) the system-specific one.
+    source ${paths[$val]}/boot.img || exit 1
+    if [ -f "${paths[$val]}/boot.img.$(sys.name)" ]; then
+        source ${paths[$val]}/boot.img.$(sys.name) || exit 1
+    fi
+
+    if type.is_func DIX_ON_AFTER; then
+        DIX_ON_AFTER $DIX_PKG
+        unset DIX_ON_AFTER
+    fi
+
+    unset DIX_PKG
+    boot.profile
+
+    read -p "Done. Press [Enter] to continue ..."
+
+done
+clear
