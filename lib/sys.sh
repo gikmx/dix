@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-[ -z "$DIX" ] && echo "Invalid environment" && exit 1
+[ ! $DIX ] && >&2 echo "${BASH_SOURCE[0]}:DIX404" && exit 1
 
 # Get the current system name
 sys.name(){
