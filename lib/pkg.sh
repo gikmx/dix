@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-! $DIX && >&2 echo "DIX404" && exit 1
+[ ! $DIX ] && >&2 echo "${BASH_SOURCE[0]}:DIX404" && exit 1
 
 pkg.exists(){
 	[ -z "$1" ] && log.error "PKG_EXISTS_406" && return 1

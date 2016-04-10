@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-! $DIX && >&2 echo "DIX404" && exit 1
+[ ! $DIX ] && >&2 echo "${BASH_SOURCE[0]}:DIX404" && exit 1
 
 string.lower() {
 	echo "$1" | tr '[:upper:]' '[:lower:]'
