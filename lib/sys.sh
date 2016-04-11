@@ -12,12 +12,6 @@ sys.has(){
 	! test -z "`command -v $1`"
 }
 
-sys.has_brew(){
-	! sys.has 'brew' && return 1               # no brew available
-	sys.has 'brew' && [ -z "$1" ] && return 0  # has brew, and no argument
-	! test -z "`brew ls --versions $1`"
-}
-
 # Test current system
 sys.is(){
 	test $(sys.name) = $(string.lower "$1")
