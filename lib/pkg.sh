@@ -46,3 +46,26 @@ pkg.fetch(){
             log.error "Could not install: ${pack[@]}" && exit 1
     done
 }
+
+pkg.enable(){
+    local names
+    eval $(pkg.__names $@)
+    for pack in "${names[@]}"; do
+        pack=($pack)
+        DIX_PKG_GROUP=${pack[0]}
+        DIX_PKG_NAME=${pack[1]}
+        DIX_PKG_REPO="`pkg.__repo ${pack[0]} ${pack[1]}`"
+        DIX_PKG_PATH="`pkg.__path ${pack[0]} ${pack[1]}`"
+        [[ ! -d "$DIX_PKG_PATH" ]] &&\
+            log.error "Package not available: ${pack[@]}" && exit 1
+        # Read configuration file
+        [[ ! -f "$DIX_PKG_PATH/boot.conf" ]] &&\
+            log.error "Invalid conf: ${pack[@]}" && exit 1
+        (
+            source "$DIX_PKG_PATH/boot.conf"
+            [[ $name != $DIX_PKG_NAME ]] &&\
+                log.error "Invalid package name: $name" && exit 1
+
+        )
+    done
+}
