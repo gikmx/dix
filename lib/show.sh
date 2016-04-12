@@ -32,3 +32,60 @@ show.title(){
 	string.repeat " " $lent && echo $1
 	string.repeat "─" $wide && echo
 }
+
+show.menu(){
+    while true; do
+        # show menu
+        clear
+        show.dix
+        show.title "Select an option"
+        echo
+
+        paths=(true)
+        infos=(true)
+
+        i=1
+        echo "0. Exit"
+        for file in `find $DIX_PATH_BOOT -type f -name "boot.conf"`; do
+            paths+=("${file%/*}")
+            infos+=("`source $file && echo $title`")
+            echo "$i. ${infos[$i]}"
+            ((i++))
+        done
+
+        show.title " "
+        read -r -n $(string.length $i) -p " {0..$((i-1))} » " val
+
+        # match the regex and be a valid index to continue
+        [[ ! $val =~ ^[0-9]+ || $val -gt $((i-1)) ]] && continue
+
+        # if 0, break the loop
+        [[ $val == 0 ]] && break
+        clear
+
+        # A boot.img must exist.
+        [ ! -f "${paths[$val]}/boot.img" ] && log.error "IMG404" && exit 1
+
+        # Let the package know its name
+        DIX_PKG="`basename ${paths[$val]}`"
+
+        # Load the common boot first, and then (if available) the system-specific one.
+        source ${paths[$val]}/boot.img || exit 1
+        if [ -f "${paths[$val]}/boot.img.$(sys.name)" ]; then
+            source ${paths[$val]}/boot.img.$(sys.name) || exit 1
+        fi
+
+        if type.is_func DIX_ON_AFTER; then
+            DIX_ON_AFTER $DIX_PKG
+            unset DIX_ON_AFTER
+        fi
+
+        unset DIX_PKG
+        boot.profile
+
+        read -p "Done. Press [Enter] to continue ..."
+
+    done
+    clear
+}
+
