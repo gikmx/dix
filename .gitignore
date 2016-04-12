@@ -3,5 +3,8 @@
 srv/*
 !srv/README.md
 
+opt/*
+!opt/README.md
+
 var/*
 !var/README.md
