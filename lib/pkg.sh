@@ -46,15 +46,17 @@ pkg.fetch(){
     # Make sure git is available before doing anything
     ! sys.has "git" && log.error "Git could not be found" && exit 1
     # Populate and validate package names
-    local names pack repo root
+    local names name pack repo root
     eval $(pkg.__names $@)
     # Iterate into sent packages and fetch the repo
     for pack in "${names[@]}"; do
-        repo="$(pkg.info.repo $pack)"
-        root="$(pkg.info.root $pack)"
-        [[ -d $root ]] && rm -Rf $root
+        name="$(pkg.info "$pack")"
+        repo="$(pkg.info.repo "$pack")"
+        root="$(pkg.info.root "$pack")"
+        [[ -d $root ]] && log.info "Already fetched: $name" && continue
         git clone $repo $root ||\
             log.error "Could not install: $(pkg.info $pack)" && exit 1
+        log.info "Fetched: $name"
     done
 }
 
