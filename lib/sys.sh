@@ -3,7 +3,7 @@
 
 # Get the current system name
 sys.name(){
-	name=$(string.lower "`uname -s`")
+	name=$(string.lower "$(uname -s)")
 	[[ $name == 'linux' && -f '/etc/arch-release' ]] && name='arch'
 	echo $name
 }
@@ -15,7 +15,7 @@ sys.supported(){
 # Test if the command ($1) is available on the system
 sys.has(){
 	[ -z "$1" ] && return 1
-	! test -z "`command -v $1`"
+	! test -z "$(command -v $1)"
 }
 
 # Test current system

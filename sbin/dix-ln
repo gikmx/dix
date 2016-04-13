@@ -3,7 +3,7 @@
 [[ ! $DIX ]] && source $HOME/.dix
 
 relpath=$(path.relative $DIX_PATH_ETC $HOME)
-dix=`find $DIX_PATH_ETC -maxdepth 1 ! -path $DIX_PATH_ETC ! -name 'README.md'`
+dix=$(find $DIX_PATH_ETC -maxdepth 1 ! -path $DIX_PATH_ETC ! -name 'README.md')
 
 for dotfile in ${dix[@]}; do
     back=''
@@ -14,7 +14,7 @@ for dotfile in ${dix[@]}; do
     if [[ -e $path ]]; then
 
         # Is this one of our symlinks?
-        [[ "$(dirname `path.real $path`)" == "$DIX_PATH_ETC" ]] && continue
+        [[ "$(dirname $(path.real $path))" == "$DIX_PATH_ETC" ]] && continue
 
         # not ours, back it up
         mv $path $HOME/$name.bak

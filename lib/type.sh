@@ -2,7 +2,7 @@
 [ ! $DIX ] && >&2 echo "${BASH_SOURCE[0]}:DIX404" && exit 1
 
 type.is_func(){
-	test "`type -t $1`" == 'function'
+	test "$(type -t $1)" == 'function'
 }
 
 # Sadly, this wouldn't work for arrays sent as params.
