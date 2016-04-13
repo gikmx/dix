@@ -39,8 +39,8 @@ pkg.fetch(){
     # Iterate into sent packages and fetch the repo
     for pack in "${names[@]}"; do
         pack=($pack) # convert it to array
-        repo="`pkg.__repo ${pack[0]} ${pack[1]}`"
-        path="`pkg.__path ${pack[0]} ${pack[1]}`"
+        repo="$(pkg.__repo ${pack[0]} ${pack[1]})"
+        path="$(pkg.__path ${pack[0]} ${pack[1]})"
         [[ -d $path ]] && rm -Rf $path
         git clone $repo $path ||\
             log.error "Could not install: ${pack[@]}" && exit 1

@@ -3,11 +3,11 @@
 
 show.dix(){
 	local line wide char dist text
-	[ $1 ] && wide=$1 || wide=`tput cols`
+	[ $1 ] && wide=$1 || wide=$(tput cols)
 	[ $2 ] && char=$2 || char='–'
 	while read line; do
 		[ ! $dist ] &&\
-			dist=`number.ceil $(number.math "($wide-$(string.length "$line"))/2")`
+			dist=$(number.ceil $(number.math "($wide-$(string.length "$line"))/2"))
 		string.repeat " " $dist && printf "$(string.upper "$line")\n"
 	done < $DIX_PATH_LIB/dix.ascii
 }
@@ -15,11 +15,11 @@ show.dix(){
 show.box(){
 	local line wide dist text
 	[[ ! $1 ]] && log.error "MissingTitle" && exit 1
-	[ $2 ] && wide=$2 || wide=`tput cols`
+	[ $2 ] && wide=$2 || wide=$(tput cols)
 	thetxt=$(string.upper "$1")
-	lentxt=`number.math $(string.length "$thetxt")`
-	lenbox=`number.math "$lentxt + 4"`
-	spaces=`number.ceil $(number.math "($wide-$lenbox)/2")`
+	lentxt=$(number.math $(string.length "$thetxt"))
+	lenbox=$(number.math "$lentxt + 4")
+	spaces=$(number.ceil $(number.math "($wide-$lenbox)/2"))
 	string.repeat " " $spaces && printf "┌─" && string.repeat "─" $lentxt && printf "─┐\n"
 	string.repeat " " $spaces && printf "│ " && printf "$thetxt"          && printf " │\n"
 	string.repeat " " $spaces && printf "└─" && string.repeat "─" $lentxt && printf "─┘\n"
@@ -27,8 +27,8 @@ show.box(){
 
 show.title(){
 	[[ ! $1 ]] && log.error "MissingTitle" && exit 1
-	local wide=`tput cols`
-	local lent=$(number.math $wide-`string.length "$1"`)
+	local wide=$(tput cols)
+	local lent=$(number.math $wide-$(string.length "$1"))
 	string.repeat " " $lent && echo $1
 	string.repeat "─" $wide && echo
 }
@@ -46,9 +46,9 @@ show.menu(){
 
         i=1
         echo "0. Exit"
-        for file in `find $DIX_PATH_BOOT -type f -name "boot.conf"`; do
+        for file in $(find $DIX_PATH_BOOT -type f -name "boot.conf"); do
             paths+=("${file%/*}")
-            infos+=("`source $file && echo $title`")
+            infos+=("$(source $file && echo $title)")
             echo "$i. ${infos[$i]}"
             ((i++))
         done
@@ -67,7 +67,7 @@ show.menu(){
         [ ! -f "${paths[$val]}/boot.img" ] && log.error "IMG404" && exit 1
 
         # Let the package know its name
-        DIX_PKG="`basename ${paths[$val]}`"
+        DIX_PKG="$(basename ${paths[$val]})"
 
         # Load the common boot first, and then (if available) the system-specific one.
         source ${paths[$val]}/boot.img || exit 1
