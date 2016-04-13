@@ -3,7 +3,13 @@
 
 # Get the current system name
 sys.name(){
-	echo $(string.lower "`uname -s`")
+	name=$(string.lower "`uname -s`")
+	[[ $name == 'linux' && -f '/etc/arch-release' ]] && name='arch'
+	echo $name
+}
+
+sys.supported(){
+	echo 'darwin linux arch'
 }
 
 # Test if the command ($1) is available on the system
@@ -15,19 +21,4 @@ sys.has(){
 # Test current system
 sys.is(){
 	test $(sys.name) = $(string.lower "$1")
-}
-
-# Test if current system is a mac
-sys.is_darwin() {
-	sys.is 'Darwin'
-}
-
-# Test if current system is linux
-sys.is_linux() {
-    sys.is 'Linux'
-}
-
-# Test if current system is archlinux
-sys.is_arch() {
-    sys.is_linux && test -f '/etc/arch-release'
 }
