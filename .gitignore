@@ -8,3 +8,9 @@ opt/*
 
 var/*
 !var/README.md
+
+boot/*
+!boot/README.md
+
+lib/**
+!lib/*.*
