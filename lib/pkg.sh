@@ -58,8 +58,19 @@ pkg.fetch(){
         root="$(pkg.info.root "$pack")"
         [[ -d $root ]] && log.info "Already fetched: $name" && continue
         git clone $repo $root ||\
-            dix.error "Could not install: $(pkg.info $pack)"
+            dix.error "Could not install: $(pkg.info "$pack")"
         log.info "Fetched: $name"
+    done
+}
+
+pkg.lose(){
+    local names pack did name root
+    names=$(pkg.__names $@) && eval $names || exit 1
+    for pack in "${names[@]}"; do
+        name="$(pkg.info "$pack")"
+        root="$(pkg.info.root "$pack")"
+        [[ ! -d $root ]] && log.error "Not found: $name" && continue
+        rm -Rf "$root" && log.info "Lost: ${root/$DIX_PATH_OPT\//}"
     done
 }
 
