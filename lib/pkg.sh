@@ -2,16 +2,16 @@
 [ ! $DIX ] && >&2 echo "${BASH_SOURCE[0]}:DIX404" && exit 1
 
 pkg.__parts(){
-    [[ ! $1 ]] && log.error "Missing package name" && exit 1
+    [[ ! $1 ]] && dix.error "Missing package name"
     local parts
     # Split string into an array separated by ":" so we can validate format
     IFS=':' read -r -a parts <<< "$1"
-    [[ ${#parts[@]} != 2 ]] && log.error "Invalid package name $1" && exit 1
+    [[ ${#parts[@]} != 2 ]] && dix.error "Invalid package name $1"
     echo "${1//:/ }"
 }
 
 pkg.__names(){
-    [[ -z "$@" ]] && log.error "Expected package name(s)" && exit 1
+    [[ -z "$@" ]] && dix.error "Expected package name(s)"
     local names=()
     local parts
     for pkg in $@; do names+=("$(pkg.__parts $pkg)"); done
@@ -21,13 +21,13 @@ pkg.__names(){
 }
 
 pkg.info(){
-    [[ ! $1 ]] && log.error "Invalid package parts" && exit 1
+    [[ ! $1 ]] && dix.error "Invalid package parts"
     pack=($1) # converts it to array
     echo "${pack[0]}-${pack[1]}"
 }
 
 pkg.info.repo(){
-    [[ ! $1 ]] && log.error "Invalid package parts" && exit 1
+    [[ ! $1 ]] && dix.error "Invalid package parts"
     pack=($1) # converts it to array
     echo "git://github.com/${pack[0]}/dix-${pack[1]}.git"
 }
@@ -44,7 +44,7 @@ pkg.info.path(){
 
 pkg.fetch(){
     # Make sure git is available before doing anything
-    ! sys.has "git" && log.error "Git could not be found" && exit 1
+    ! sys.has "git" && dix.error "Git could not be found"
     # Populate and validate package names
     local names name pack repo root
     eval $(pkg.__names $@)
@@ -55,7 +55,7 @@ pkg.fetch(){
         root="$(pkg.info.root "$pack")"
         [[ -d $root ]] && log.info "Already fetched: $name" && continue
         git clone $repo $root ||\
-            log.error "Could not install: $(pkg.info $pack)" && exit 1
+            dix.error "Could not install: $(pkg.info $pack)"
         log.info "Fetched: $name"
     done
 }
@@ -70,7 +70,7 @@ pkg.enable(){
         DIX_PKG_PATH="$(pkg.info.path "$pack")"
 
         [[ ! -d "$DIX_PKG_ROOT" ]] &&\
-            log.error "Package not available: $DIX_PKG" && exit 1
+            dix.error "Package not available: $DIX_PKG"
 
         [[ -d "$DIX_PKG_PATH" ]] && rm -Rf "$DIX_PKG_PATH"
 
@@ -123,11 +123,11 @@ pkg.install(){
     # TODO: Finish this
     # Read configuration file
     [[ ! -f "$DIX_PKG_ROOT/boot.conf" ]] &&\
-        log.error "Invalid conf: $DIX_PKG" && exit 1
+        dix.error "Invalid conf: $DIX_PKG"
     (
         source "$DIX_PKG_ROOT/boot.conf"
         [[ $name != $DIX_PKG ]] &&\
-            log.error "Invalid package name: $name" && exit 1
+            dix.error "Invalid package name: $name"
 
     )
 }

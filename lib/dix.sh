@@ -13,6 +13,12 @@ if [[ -z "$DIX_PATH" ]]; then
 	popd > /dev/null
 fi
 
+# Centralise error handling
+dix.error(){
+	log.error $1
+	exit 1
+}
+
 # Convert directories in $1 into files in $2
 dix.env_set(){
 	[[ ! $1 || ! $2 ]] && >&2 echo "ERR:dix.set_srv" && exit 1
@@ -56,7 +62,7 @@ dix.dotfiles(){
 
 	for pkg in ${pkgs[@]}; do
 		dir=$DIX_PATH_BOOT/$pkg
-		[ ! -d $dir ] && log.error "PKG404:$pkg" && exit 1
+		[ ! -d $dir ] && dix.error "PKG404:$pkg"
 		[ ! -f "$dir/profile" ] && continue
 		source "$dir/profile"
 		[ ! -f "$dir/profile.$(sys.name)" ] && continue
