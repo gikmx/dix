@@ -13,6 +13,6 @@ dix.env_set $DIX_PATH $DIX_PATH/srv
 dix.load
 
 # This file is just a wrapper for the pkg library
-[[ ! $1 ]] && log.error "Expecting a verb" && exit 1
-! type.is_func pkg.$1 && log.error "Invalid verb" && exit 1
+[[ ! $1 ]] && dix.error "Expecting a verb"
+! type.is_func pkg.$1 && dix.error "Invalid verb"
 pkg.$@
