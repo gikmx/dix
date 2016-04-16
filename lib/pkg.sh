@@ -5,16 +5,19 @@ pkg.__parts(){
     [[ ! $1 ]] && dix.error "Missing package name"
     local parts
     # Split string into an array separated by ":" so we can validate format
-    IFS=':' read -r -a parts <<< "$1"
+    IFS='-' read -r -a parts <<< "$1"
     [[ ${#parts[@]} != 2 ]] && dix.error "Invalid package name $1"
-    echo "${1//:/ }"
+    echo "${1//-/ }"
 }
 
 pkg.__names(){
     [[ -z "$@" ]] && dix.error "Expected package name(s)"
     local names=()
     local parts
-    for pkg in $@; do names+=("$(pkg.__parts $pkg)"); done
+    for pkg in $@; do
+        parts="$(pkg.__parts $pkg)" || exit 1
+        names+=("$parts")
+    done
     # echoes the variable declaration, so it can be evaulated on calling func.
     # This is the only way I've found to return an array
     declare -p names
@@ -47,7 +50,7 @@ pkg.fetch(){
     ! sys.has "git" && dix.error "Git could not be found"
     # Populate and validate package names
     local names name pack repo root
-    eval $(pkg.__names $@)
+    names=$(pkg.__names $@) && eval $names || exit 1
     # Iterate into sent packages and fetch the repo
     for pack in "${names[@]}"; do
         name="$(pkg.info "$pack")"
@@ -61,8 +64,8 @@ pkg.fetch(){
 }
 
 pkg.enable(){
-    local names DIX_PKG DIX_PKG_REPO DIX_PKG_ROOT DIX_PKG_PATH
-    eval $(pkg.__names $@)
+    local names pack cmd DIX_PKG DIX_PKG_REPO DIX_PKG_ROOT DIX_PKG_PATH
+    names=$(pkg.__names $@) && eval $names || exit 1
     for pack in "${names[@]}"; do
         DIX_PKG="$(pkg.info "$pack")"
         DIX_PKG_REPO="$(pkg.info.repo "$pack")"
@@ -106,8 +109,8 @@ pkg.enable(){
 }
 
 pkg.disable(){
-    eval $(pkg.__names $@)
-    local paths path did
+    local names pack DIX_PKG
+    names=$(pkg.__names $@) && eval $names || exit 1
     for pack in "${names[@]}"; do
         DIX_PKG="$(pkg.info "$pack")"
         paths=$(find "$DIX_PATH" ! -type f ! -path "$DIX_PATH_OPT/*" -name "$DIX_PKG")
@@ -115,7 +118,7 @@ pkg.disable(){
         for path in $paths; do
             rm -Rf "$path" && log.info "Removed ${path/$DIX_PATH\//}" && did=true
         done
-        $did && log.info "Disabled: $DIX_PKG"
+        $did && log.info "Disabled: $DIX_PKG" || log.info "Not found: $DIX_PKG"
     done
 }
 
