@@ -12,6 +12,14 @@ show.dix(){
 	done < $DIX_PATH_LIB/dix.ascii
 }
 
+show.error(){
+    echo "DIX» $@" 1>&2
+}
+
+show.info(){
+    echo "DIX» $@"
+}
+
 show.box(){
 	local line wide dist text
 	[[ ! $1 ]] && dix.error "MissingTitle"
