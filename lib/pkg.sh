@@ -134,14 +134,28 @@ pkg.disable(){
 }
 
 pkg.install(){
-    # TODO: Finish this
-    # Read configuration file
-    [[ ! -f "$DIX_PKG_ROOT/boot.conf" ]] &&\
-        dix.error "Invalid conf: $DIX_PKG"
-    (
-        source "$DIX_PKG_ROOT/boot.conf"
-        [[ $name != $DIX_PKG ]] &&\
-            dix.error "Invalid package name: $name"
-
-    )
+    local names pack DIX_PKG
+    names=$(pkg.__names $@) && eval $names || exit 1
+    for pack in "${names[@]}"; do
+        DIX_PKG="$(pkg.info "$pack")"
+        pkg.fetch $DIX_PKG && pkg.enable $DIX_PKG
+        # Setup variables
+        DIX_PKG_REPO="$(pkg.info.repo "$pack")"
+        DIX_PKG_ROOT="$(pkg.info.root "$pack")"
+        DIX_PKG_PATH="$(pkg.info.path "$pack")"
+        # Load this in a subshell
+        (
+            # load the configuration
+            [[ ! -f "$DIX_PKG_ROOT/boot.conf" ]] && dix.error "Missing conf: $DIX_PKG"
+            source "$DIX_PKG_ROOT/boot.conf" || dix.error "Invalid conf: $DIX_PKG"
+            # make sure an array specifying the dependencies is declared
+            # TODO: Implement the sub installation process.
+            ! type.is_array DIX_REQUIRE &&\
+                dix.error "Invalid conf (required array): $DIX_PKG"
+            # run the installation script
+            [[ ! -f "$DIX_PKG_ROOT/boot" ]] && dix.error "Missing boot: $DIX_PKG"
+            source "$DIX_PKG_ROOT/boot"  || dix.error "Invalid boot: $DIX_PKG"
+            type.is_func DIX_ON_AFTER && DIX_ON_AFTER
+        )
+    done
 }
