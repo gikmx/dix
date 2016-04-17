@@ -23,6 +23,30 @@ pkg.__names(){
     declare -p names
 }
 
+pkg.__boothalt(){
+    local TYPE=$1 && shift
+    local names pack
+    names=$(pkg.__names $@) && eval $names || exit 1
+    # run each boot script in a sub shell.
+    for pack in "${names[@]}"; do (
+        DIX_PKG="$(pkg.info "$pack")"
+        DIX_PKG_REPO="$(pkg.info.repo "$pack")"
+        DIX_PKG_ROOT="$(pkg.info.root "$pack")"
+        DIX_PKG_PATH="$(pkg.info.path "$pack")"
+        # TODO: Implement the sub installation process.
+        [[ ! -f "$DIX_PKG_PATH/$TYPE" ]] &&\
+            log.info "Not found for $TYPE: $DIX_PKG" && continue
+        # load the configuration
+        [[ ! -f "$DIX_PKG_PATH/boot.conf" ]] && dix.error "Missing conf: $DIX_PKG"
+        source "$DIX_PKG_PATH/boot.conf" || dix.error "Invalid conf: $DIX_PKG"
+        # make sure an array specifying the dependencies is declared
+        ! type.is_array DIX_REQUIRE && dix.error "Invalid conf (required array): $DIX_PKG"
+
+        source "$DIX_PKG_PATH/$TYPE"
+        type.is_func DIX_ON_AFTER && DIX_ON_AFTER
+    ); done
+}
+
 pkg.info(){
     [[ ! $1 ]] && dix.error "Invalid package parts"
     pack=($1) # converts it to array
@@ -134,27 +158,11 @@ pkg.disable(){
 }
 
 pkg.boot(){
-    local names pack
-    names=$(pkg.__names $@) && eval $names || exit 1
-    # run each boot script in a sub shell.
-    for pack in "${names[@]}"; do (
-        DIX_PKG="$(pkg.info "$pack")"
-        DIX_PKG_REPO="$(pkg.info.repo "$pack")"
-        DIX_PKG_ROOT="$(pkg.info.root "$pack")"
-        DIX_PKG_PATH="$(pkg.info.path "$pack")"
-        # load the configuration
-        [[ ! -f "$DIX_PKG_ROOT/boot.conf" ]] && dix.error "Missing conf: $DIX_PKG"
-        source "$DIX_PKG_ROOT/boot.conf" || dix.error "Invalid conf: $DIX_PKG"
-        # make sure an array specifying the dependencies is declared
-        # TODO: Implement the sub installation process.
-        ! type.is_array DIX_REQUIRE &&\
-            dix.error "Invalid conf (required array): $DIX_PKG"
-        # run the installation script
-        [[ ! -f "$DIX_PKG_ROOT/boot" ]] && dix.error "Missing boot: $DIX_PKG"
-        ! source "$DIX_PKG_ROOT/boot"  &&\
-            dix.error "Invalid boot: $DIX_PKG" ||\
-            type.is_func DIX_ON_AFTER && DIX_ON_AFTER
-    ); done
+    pkg.__boothalt boot $@
+}
+
+pkg.halt(){
+    pkg.__boothalt halt $@
 }
 
 pkg.install(){
@@ -162,6 +170,15 @@ pkg.install(){
     names=$(pkg.__names $@) && eval $names || exit 1
     for pack in "${names[@]}"; do
         name="$(pkg.info "$pack")"
-        pkg.fetch $name && pkg.boot $name && pkg.enable $name
+        pkg.fetch "$name" && pkg.enable "$name" && pkg.boot "$name"
+    done
+}
+
+pkg.uninstall(){
+    local names pack name
+    names=$(pkg.__names $@) && eval $names || exit 1
+    for pack in "${names[@]}"; do
+        name="$(pkg.info "$pack")"
+        pkg.halt "$name" && pkg.disable "$name" && pkg.lose "$name"
     done
 }
