@@ -15,7 +15,7 @@ fi
 
 # Centralise error handling
 dix.error(){
-	log.error $1
+	show.error $1
 	exit 1
 }
 

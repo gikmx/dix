@@ -35,7 +35,7 @@ pkg.__boothalt(){
         DIX_PKG_PATH="$(pkg.info.path "$pack")"
         # TODO: Implement the sub installation process.
         [[ ! -f "$DIX_PKG_PATH/$TYPE" ]] &&\
-            log.info "Not found for $TYPE: $DIX_PKG" && continue
+            show.info "Not found for $TYPE: $DIX_PKG" && continue
         # load the configuration
         [[ ! -f "$DIX_PKG_PATH/boot.conf" ]] && dix.error "Missing conf: $DIX_PKG"
         source "$DIX_PKG_PATH/boot.conf" || dix.error "Invalid conf: $DIX_PKG"
@@ -80,10 +80,10 @@ pkg.fetch(){
         name="$(pkg.info "$pack")"
         repo="$(pkg.info.repo "$pack")"
         root="$(pkg.info.root "$pack")"
-        [[ -d $root ]] && log.info "Already fetched: $name" && continue
+        [[ -d $root ]] && show.info "Already fetched: $name" && continue
         git clone $repo $root ||\
             dix.error "Could not install: $(pkg.info "$pack")"
-        log.info "Fetched: $name"
+        show.info "Fetched: $name"
     done
 }
 
@@ -93,8 +93,8 @@ pkg.lose(){
     for pack in "${names[@]}"; do
         name="$(pkg.info "$pack")"
         root="$(pkg.info.root "$pack")"
-        [[ ! -d $root ]] && log.error "Not found: $name" && continue
-        rm -Rf "$root" && log.info "Lost: ${root/$DIX_PATH_OPT\//}"
+        [[ ! -d $root ]] && show.error "Not found: $name" && continue
+        rm -Rf "$root" && show.info "Lost: ${root/$DIX_PATH_OPT\//}"
     done
 }
 
@@ -124,7 +124,7 @@ pkg.enable(){
             # does a platform specific file exist? append it to normal file.
             platname="$origname.$(sys.name)"
             [[ -f $platname ]] && echo -e "\n$(cat $platname)\n" >> $bootname
-            log.info "Copied: $DIX_PKG${bootname/$DIX_PKG_PATH/}"
+            show.info "Copied: $DIX_PKG${bootname/$DIX_PKG_PATH/}"
         done
         unset cmd platform origname bootname platname
 
@@ -135,11 +135,11 @@ pkg.enable(){
             dest=${!dest}
             rm -rf "$dest/$DIX_PKG"
             ln -s "$path" "$dest/$DIX_PKG"
-            log.info "Linked: $DIX_PKG${path/$DIX_PKG_PATH/}"
+            show.info "Linked: $DIX_PKG${path/$DIX_PKG_PATH/}"
         done
         unset path dest
 
-        log.info "Enabled: $DIX_PKG"
+        show.info "Enabled: $DIX_PKG"
     done
 }
 
@@ -151,9 +151,9 @@ pkg.disable(){
         paths=$(find "$DIX_PATH" ! -type f ! -path "$DIX_PATH_OPT/*" -name "$DIX_PKG")
         did=false
         for path in $paths; do
-            rm -Rf "$path" && log.info "Removed ${path/$DIX_PATH\//}" && did=true
+            rm -Rf "$path" && show.info "Removed ${path/$DIX_PATH\//}" && did=true
         done
-        $did && log.info "Disabled: $DIX_PKG" || log.info "Not found: $DIX_PKG"
+        $did && show.info "Disabled: $DIX_PKG" || show.info "Not found: $DIX_PKG"
     done
 }
 

@@ -8,5 +8,5 @@ for dotfile in ${dix[@]}; do
 	path=$HOME/.$name
 	real=$(dirname $(path.real $path))
 	[[ ! -L "$path" || "$real" != "$DIX_PATH_ETC"  ]] && continue
-	rm -Rf $path && log.info "Removed $name"
+	rm -Rf $path && show.info "Removed $name"
 done
