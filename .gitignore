@@ -1,9 +1,7 @@
 *.DS_*
 
-srv/*
-!srv/README.md
-
 opt/*
+!opt/dix
 !opt/README.md
 
 var/*

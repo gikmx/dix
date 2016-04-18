@@ -6,11 +6,11 @@ pushd $(dirname ${BASH_SOURCE[0]}) > /dev/null
 popd > /dev/null
 
 # Source the library
-source $DIX_PATH/lib/dix.sh || exit 1
+source $DIX_PATH/opt/dix/lib/dix.sh || exit 1
 
-# set the environment and then load dix.
-dix.env_set $DIX_PATH $DIX_PATH/srv
-dix.load
+# save to environment to disk and then load it
+dix.env.save $DIX_PATH $DIX_PATH/var/env
+dix.env.load $DIX_PATH/env
 
 # This file is just a wrapper for the pkg library
 [[ ! $1 ]] && dix.error "Expecting a verb"
