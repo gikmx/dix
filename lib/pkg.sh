@@ -41,7 +41,11 @@ pkg.__boothalt(){
         source "$DIX_PKG_PATH/boot.conf" || dix.error "Invalid conf: $DIX_PKG"
         # make sure an array specifying the dependencies is declared
         ! type.is_array DIX_REQUIRE && dix.error "Invalid conf (required array): $DIX_PKG"
-
+        # Install subdependencies:
+        # TODO: Handle uninstallation of dependencies
+        [[ "$TYPE"  == 'boot' && ${#DIX_REQUIRE[@]} -gt 0 ]] &&\
+            pkg.install ${DIX_REQUIRE[@]}
+        # Everything ready, run the script
         source "$DIX_PKG_PATH/$TYPE"
         type.is_func DIX_ON_AFTER && DIX_ON_AFTER
     ); done
