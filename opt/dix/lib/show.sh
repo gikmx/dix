@@ -12,17 +12,9 @@ show.dix(){
 	done < $DIX_PATH_LIB/dix.ascii
 }
 
-show.error(){
-    echo "DIX» $@" 1>&2
-}
-
-show.info(){
-    echo "DIX» $@"
-}
-
 show.box(){
 	local line wide dist text
-	[[ ! $1 ]] && dix.error "MissingTitle"
+	[[ ! $1 ]] && dix.throw "MissingTitle"
 	[ $2 ] && wide=$2 || wide=$(tput cols)
 	thetxt=$(string.upper "$1")
 	lentxt=$(number.math $(string.length "$thetxt"))
@@ -34,7 +26,7 @@ show.box(){
 }
 
 show.title(){
-	[[ ! $1 ]] && dix.error "MissingTitle"
+	[[ ! $1 ]] && dix.throw "MissingTitle"
 	local wide=$(tput cols)
 	local lent=$(number.math $wide-$(string.length "$1"))
 	string.repeat " " $lent && echo $1
@@ -72,7 +64,7 @@ show.menu(){
         clear
 
         # A boot.img must exist.
-        [ ! -f "${paths[$val]}/boot.img" ] && dix.error "IMG404"
+        [ ! -f "${paths[$val]}/boot.img" ] && dix.throw "IMG404"
 
         # Let the package know its name
         DIX_PKG="$(basename ${paths[$val]})"

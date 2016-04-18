@@ -13,23 +13,34 @@ if [[ -z "$DIX_PATH" ]]; then
 	popd > /dev/null
 fi
 
+dix.log(){
+    echo "DIX» $@"
+}
+
+dix.log.error(){
+    dix.log "ERROR» $@" 1>&2
+}
+
 # Centralise error handling
-dix.error(){
-	show.error $1
+dix.throw(){
+	dix.log.error "$@"
 	exit 1
 }
 
 # Convert directories in $1 into files in $2
 dix.env.save(){
 	[[ ! $1 || ! $2 ]] && >&2 echo "ERR:dix.set_srv" && exit 1
-	local path name
+	local path name dirs=()
 	# Set the path environment variables
 	for path in $(find $1 -maxdepth 1 -type d ! -name ".*" ! -path $1); do
-	    name="DIX_PATH_$(basename $path | tr '[:lower:]' '[:upper:]')"
+		base=$(basename $path)
+	    name="DIX_PATH_$(echo $base | tr '[:lower:]' '[:upper:]')"
+	    dirs+=("$base")
 	    echo "$path" > "$2/$name"
 	done
 	echo "$2" > "$2/DIX_PATH_ENV"
 	echo "$1" > "$2/DIX_PATH"
+	echo "${dirs[@]}" > "$2/DIX_DIRS"
 }
 
 # Populates the environment using files on $1
@@ -56,8 +67,8 @@ dix.load.lib(){
 }
 
 dix.load(){
-	dix.load.srv $DIX_PATH/srv
-	dix.load.lib $DIX_PATH/lib
+	dix.env.load $DIX_PATH/var/env
+	# dix.load.lib $DIX_PATH/lib
 	# dix.etc $DIX_PATH/etc
 }
 

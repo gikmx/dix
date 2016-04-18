@@ -25,6 +25,6 @@ for dotfile in ${dix[@]}; do
     pushd "$HOME" > /dev/null
         ln -s $relpath/$name  ".$name"
     popd > /dev/null
-    show.info "Symlinked $([ $back ] && printf '(existing) ') $name"
+    dix.log "Symlinked $([ $back ] && printf '(existing) ') $name"
 
 done

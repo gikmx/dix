@@ -2,16 +2,16 @@
 [ ! $DIX ] && >&2 echo "${BASH_SOURCE[0]}:DIX404" && exit 1
 
 pkg.__parts(){
-    [[ ! $1 ]] && dix.error "Missing package name"
+    [[ ! $1 ]] && dix.throw "Missing package name"
     local parts
     # Split string into an array separated by ":" so we can validate format
     IFS='-' read -r -a parts <<< "$1"
-    [[ ${#parts[@]} != 2 ]] && dix.error "Invalid package name $1"
+    [[ ${#parts[@]} != 2 ]] && dix.throw "Invalid package name $1"
     echo "${1//-/ }"
 }
 
 pkg.__names(){
-    [[ -z "$@" ]] && dix.error "Expected package name(s)"
+    [[ -z "$@" ]] && dix.throw "Expected package name(s)"
     local names=()
     local parts
     for pkg in $@; do
@@ -35,12 +35,12 @@ pkg.__boothalt(){
         DIX_PKG_PATH="$(pkg.info.path "$pack")"
         # TODO: Implement the sub installation process.
         [[ ! -f "$DIX_PKG_PATH/$TYPE" ]] &&\
-            show.info "Not found for $TYPE: $DIX_PKG" && continue
+            dix.log "Not found for $TYPE: $DIX_PKG" && continue
         # load the configuration
-        [[ ! -f "$DIX_PKG_PATH/boot.conf" ]] && dix.error "Missing conf: $DIX_PKG"
-        source "$DIX_PKG_PATH/boot.conf" || dix.error "Invalid conf: $DIX_PKG"
+        [[ ! -f "$DIX_PKG_PATH/boot.conf" ]] && dix.throw "Missing conf: $DIX_PKG"
+        source "$DIX_PKG_PATH/boot.conf" || dix.throw "Invalid conf: $DIX_PKG"
         # make sure an array specifying the dependencies is declared
-        ! type.is_array DIX_REQUIRE && dix.error "Invalid conf (required array): $DIX_PKG"
+        ! type.is_array DIX_REQUIRE && dix.throw "Invalid conf (required array): $DIX_PKG"
         # Install subdependencies:
         # TODO: Handle uninstallation of dependencies
         [[ "$TYPE"  == 'boot' && ${#DIX_REQUIRE[@]} -gt 0 ]] &&\
@@ -52,13 +52,13 @@ pkg.__boothalt(){
 }
 
 pkg.info(){
-    [[ ! $1 ]] && dix.error "Invalid package parts"
+    [[ ! $1 ]] && dix.throw "Invalid package parts"
     pack=($1) # converts it to array
     echo "${pack[0]}-${pack[1]}"
 }
 
 pkg.info.repo(){
-    [[ ! $1 ]] && dix.error "Invalid package parts"
+    [[ ! $1 ]] && dix.throw "Invalid package parts"
     pack=($1) # converts it to array
     echo "git://github.com/${pack[0]}/dix-${pack[1]}.git"
 }
@@ -75,7 +75,7 @@ pkg.info.path(){
 
 pkg.fetch(){
     # Make sure git is available before doing anything
-    ! sys.has "git" && dix.error "Git could not be found"
+    ! sys.has "git" && dix.throw "Git could not be found"
     # Populate and validate package names
     local names name pack repo root
     names=$(pkg.__names $@) && eval $names || exit 1
@@ -84,10 +84,10 @@ pkg.fetch(){
         name="$(pkg.info "$pack")"
         repo="$(pkg.info.repo "$pack")"
         root="$(pkg.info.root "$pack")"
-        [[ -d $root ]] && show.info "Already fetched: $name" && continue
+        [[ -d $root ]] && dix.log "Already fetched: $name" && continue
         git clone $repo $root ||\
-            dix.error "Could not install: $(pkg.info "$pack")"
-        show.info "Fetched: $name"
+            dix.throw "Could not install: $(pkg.info "$pack")"
+        dix.log "Fetched: $name"
     done
 }
 
@@ -97,8 +97,8 @@ pkg.lose(){
     for pack in "${names[@]}"; do
         name="$(pkg.info "$pack")"
         root="$(pkg.info.root "$pack")"
-        [[ ! -d $root ]] && show.error "Not found: $name" && continue
-        rm -Rf "$root" && show.info "Lost: ${root/$DIX_PATH_OPT\//}"
+        [[ ! -d $root ]] && dix.log.error "Not found: $name" && continue
+        rm -Rf "$root" && dix.log "Lost: ${root/$DIX_PATH_OPT\//}"
     done
 }
 
@@ -112,7 +112,7 @@ pkg.enable(){
         DIX_PKG_PATH="$(pkg.info.path "$pack")"
 
         [[ ! -d "$DIX_PKG_ROOT" ]] &&\
-            dix.error "Package not available: $DIX_PKG"
+            dix.throw "Package not available: $DIX_PKG"
 
         [[ -d "$DIX_PKG_PATH" ]] && rm -Rf "$DIX_PKG_PATH"
 
@@ -128,7 +128,7 @@ pkg.enable(){
             # does a platform specific file exist? append it to normal file.
             platname="$origname.$(sys.name)"
             [[ -f $platname ]] && echo -e "\n$(cat $platname)\n" >> $bootname
-            show.info "Copied: $DIX_PKG${bootname/$DIX_PKG_PATH/}"
+            dix.log "Copied: $DIX_PKG${bootname/$DIX_PKG_PATH/}"
         done
         unset cmd platform origname bootname platname
 
@@ -139,11 +139,11 @@ pkg.enable(){
             dest=${!dest}
             rm -rf "$dest/$DIX_PKG"
             ln -s "$path" "$dest/$DIX_PKG"
-            show.info "Linked: $DIX_PKG${path/$DIX_PKG_PATH/}"
+            dix.log "Linked: $DIX_PKG${path/$DIX_PKG_PATH/}"
         done
         unset path dest
 
-        show.info "Enabled: $DIX_PKG"
+        dix.log "Enabled: $DIX_PKG"
     done
 }
 
@@ -155,9 +155,9 @@ pkg.disable(){
         paths=$(find "$DIX_PATH" ! -type f ! -path "$DIX_PATH_OPT/*" -name "$DIX_PKG")
         did=false
         for path in $paths; do
-            rm -Rf "$path" && show.info "Removed ${path/$DIX_PATH\//}" && did=true
+            rm -Rf "$path" && dix.log "Removed ${path/$DIX_PATH\//}" && did=true
         done
-        $did && show.info "Disabled: $DIX_PKG" || show.info "Not found: $DIX_PKG"
+        $did && dix.log "Disabled: $DIX_PKG" || dix.log "Not found: $DIX_PKG"
     done
 }
 
