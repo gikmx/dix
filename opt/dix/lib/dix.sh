@@ -30,6 +30,7 @@ dix.throw(){
 # Convert directories in $1 into files in $2
 dix.env.save(){
 	[[ ! $1 || ! $2 ]] && >&2 echo "ERR:dix.set_srv" && exit 1
+	[ ! -d "$2" ] && mkdir -p $2
 	local path name dirs=()
 	# Set the path environment variables
 	for path in $(find $1 -maxdepth 1 -type d ! -name ".*" ! -path $1); do
