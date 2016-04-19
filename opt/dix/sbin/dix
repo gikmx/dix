@@ -10,10 +10,14 @@ source $DIX_PATH/opt/dix/lib/dix.sh || exit 1
 
 # save to environment to disk and then load it
 dix.env.save $DIX_PATH $DIX_PATH/var/env
-dix.load
+dix.env.load $DIX_PATH/var/env
 
-exit
+# Load libs manually
+libs=$(find $DIX_PATH/opt/dix/lib -type f -name "*.sh" ! -name "dix.sh")
+for lib in ${libs[@]}; do source $lib; done
+unset lib libs
+
 # This file is just a wrapper for the pkg library
 [[ ! $1 ]] && dix.throw "Expecting a verb"
-! type.is_func pkg.$1 && dix.throw "Invalid verb"
-pkg.$@
+! type.is_func cmd.$1 && dix.throw "Invalid verb"
+cmd.$@
