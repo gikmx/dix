@@ -5,24 +5,38 @@ pkg.parse(){
     [[ -z "$@" ]] && dix.throw "Expected package name(s)"
     local pkgs=()
     for pkg in $@; do
-        parts="$(pkg.__parts $pkg)" || exit 1
+        if [[ -f "$pkg/boot.conf" ]]; then
+            pkg=("local" "$pkg" "$(basename $pkg)")
+        else
+            eval "$(string.split "$pkg" '-' 'pkg')"
+            [[ ${#pkg[@]} < 2 ]] && dix.throw "Invalid package format: $pkg"
+            pkg=("git" "${pkg[0]}" "${pkg[1]}")
+        fi
         # Appends an array declaration to the pkgs array
-        pkgs+=("$(string.split "$pkg" '-' 'pkg')")
+        pkgs+=("$(declare -p pkg)")
     done
     # Return the array of arrays declaration so it can be evaluated
-    declare -p pkgs
+    echo $(declare -p pkgs)
 }
 
 pkg.info.name(){
     [[ ! $1 ]] && dix.throw "Invalid package parts"
     local pkg && eval $1
-    echo "${pkg[0]}-${pkg[1]}"
+    if [[ "${pkg[0]}" == 'local' ]]; then
+        echo "${pkg[2]}"
+    else
+        echo "${pkg[1]}-${pkg[2]}"
+    fi
 }
 
 pkg.info.repo(){
     [[ ! $1 ]] && dix.throw "Invalid package parts"
     local pkg && eval $1
-    echo "git://github.com/${pkg[0]}/dix-${pkg[1]}.git"
+    if [[ "${pkg[0]}" == 'local' ]]; then
+        echo "${pkg[1]}"
+    else
+        echo "git://github.com/${pkg[1]}/dix-${pkg[2]}.git"
+    fi
 }
 
 pkg.info.root(){
@@ -64,8 +78,7 @@ pkg.boot.run(){
         ! pkg.boot.check "$DIX_PKG_PATH" "$DIX_PKG_TYPE" && continue
 
         # handle subdependencies first
-        [[ "$DIX_PKG_TYPE" == 'boot']] && cmd='install' || cmd='uninstall'
-        [[ ${#requires}]]
+        [[ "$DIX_PKG_TYPE" == 'boot' ]] && cmd='install' || cmd='uninstall'
 
         # Install subdependencies:
         # TODO: Handle uninstallation of dependencies
